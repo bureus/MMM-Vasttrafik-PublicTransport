@@ -25,7 +25,7 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
     },
 
     getHeader: function () {
-        var stopId = this.config.stopId + "";
+        var stopId = this.config.stopId;
         return this.data.header + " " + stopId;
     },
 
