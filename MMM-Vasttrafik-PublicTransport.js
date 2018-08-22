@@ -21,7 +21,7 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
     },
 
     getScripts: function () {
-        "moment.js"
+        return ["moment.js"];
     },
 
     start: function () {
