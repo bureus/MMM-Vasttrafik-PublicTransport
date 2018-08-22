@@ -36,7 +36,7 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
 
     getDom: function () {
         var wrapper = document.createElement("div");
-        wrapper.innerHTML = "Nästa tur för " + this.config.stopId;
+        wrapper.innerHTML = "Stop id: " + this.config.stopId;
         return wrapper;
     }
 });
