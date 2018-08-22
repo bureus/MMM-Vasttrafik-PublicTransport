@@ -24,9 +24,14 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
         return ["moment.js"];
     },
 
+    getHeader: function () {
+        var stopId = this.config.stopId + "";
+        return this.data.header + " " + stopId;
+    },
+
     start: function () {
         Log.info("Starting module: " + this.name);
-        this.getDom();
+        this.updateDom();
     },
 
     getDom: function () {
@@ -34,12 +39,4 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
         wrapper.innerHTML = "Nästa tur för " + this.config.stopId;
         return wrapper;
     }
-
-    /*getTemplate: function () {
-        return "board.njk"
-    },
-
-    getTemplateData: function () {
-        return this.config
-    }*/
 });
