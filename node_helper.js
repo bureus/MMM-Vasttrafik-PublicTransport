@@ -27,8 +27,6 @@ module.exports = NodeHelper.create({
         //Log.info('Starting helper: '+ this.name);
         log('Starting helper: ' + this.name);
         this.started = false;
-        log("Getting access token...");
-        self.getAccessToken();
     },
 
     // --------------------------------------- Schedule a departure update
@@ -317,11 +315,13 @@ module.exports = NodeHelper.create({
     // --------------------------------------- Handle notifocations
     socketNotificationReceived: function (notification, payload) {
         const self = this;
+        log("socketNotificationReceived")
         if (notification === 'CONFIG' /*&& this.started == false*/) {
+            log("CONFIG event received")
             this.config = payload;
             this.started = true;
             debugMe = this.config.debug;
-            //self.scheduleUpdate();
+            self.getAccessToken(); // Get inital access token
             //self.getDepartures(); // Get it first time
         };
     }

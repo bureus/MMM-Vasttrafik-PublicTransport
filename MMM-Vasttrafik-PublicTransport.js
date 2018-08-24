@@ -37,7 +37,9 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
         this.updateDom();
 
         //Send config to node_helper
+        Log.info("Send configs to node_helper..");
         this.sendSocketNotification("CONFIG", this.config);
+        var self = this;
     },
 
     getDom: function () {
