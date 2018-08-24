@@ -48,12 +48,13 @@ module.exports = NodeHelper.create({
             method: "POST",
             uri: "https://api.vasttrafik.se/token",
             headers: {
-                "Authorization": "Basic " + basicAuth
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Authorization": "Basic " + basicAuth,
             },
             body: {
                 some: "grant_type=client_credentials&scope=deviceId"
-            },
-            json: true // Automatically stringifies the body to JSON
+            }
+            //json: false // Automatically stringifies the body to JSON
         };
 
         request(options)
