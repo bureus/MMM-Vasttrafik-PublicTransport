@@ -27,24 +27,23 @@ module.exports = NodeHelper.create({
         //Log.info('Starting helper: '+ this.name);
         log('Starting helper: ' + this.name);
         this.started = false;
+        log("Getting access token...");
+        self.getAccessToken();
     },
 
     // --------------------------------------- Schedule a departure update
     scheduleUpdate: function () {
         var self = this;
-        Log.log(this.name + " is started!");
         //debug('scheduleUpdate=' + self.getNextUpdateInterval());
         /*this.updatetimer = setInterval(function () { // This timer is saved in uitimer so that we can cancel it
             self.getDepartures();
         }, self.getNextUpdateInterval());*/
-        Log.log("Get access token...");
-        self.getAccessToken();
     },
 
     // --------------------------------------- Get access token
     getAccessToken: function () {
         var self = this;
-        Log.log("trying to generate access token with key:secret =" + this.config.appKey + ":" + this.config.appSecret);
+        log("trying to generate access token with key:secret =" + this.config.appKey + ":" + this.config.appSecret);
         var basicAuth = encode.encode(this.config.appKey + ":" + this.config.appSecret, "base64")
         debug("base64 encoded credentials = " + basicAuth);
         var options = {
@@ -62,7 +61,7 @@ module.exports = NodeHelper.create({
 
         request(options)
             .then(function (parsedBody) {
-                Log.log("Token retrived successfully from Västtrafik");
+                log("Token retrived successfully from Västtrafik");
                 self.accessToken = {
                     token: parsedBody.access_token,
                     expires: parsedBody.expires_in
@@ -70,7 +69,7 @@ module.exports = NodeHelper.create({
                 self.sendSocketNotification("TOKEN_RECIVED:", self.accessToken);
             })
             .catch(function (err) {
-                Log.log("generateAccessToken failed =" + err);
+                log("generateAccessToken failed =" + err);
                 self.sendSocketNotification("SERVICE_FAILURE", err);
             });
 
