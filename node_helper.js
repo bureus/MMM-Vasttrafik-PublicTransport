@@ -32,17 +32,19 @@ module.exports = NodeHelper.create({
     // --------------------------------------- Schedule a departure update
     scheduleUpdate: function () {
         var self = this;
+        Log.log(this.name + " is started!");
         //debug('scheduleUpdate=' + self.getNextUpdateInterval());
         /*this.updatetimer = setInterval(function () { // This timer is saved in uitimer so that we can cancel it
             self.getDepartures();
         }, self.getNextUpdateInterval());*/
+        Log.log("Get access token...");
         self.getAccessToken();
     },
 
     // --------------------------------------- Get access token
     getAccessToken: function () {
         var self = this;
-        debug("trying to generate access token with key:secret =" + this.config.appKey + ":" + this.config.appSecret);
+        Log.log("trying to generate access token with key:secret =" + this.config.appKey + ":" + this.config.appSecret);
         var basicAuth = encode.encode(this.config.appKey + ":" + this.config.appSecret, "base64")
         debug("base64 encoded credentials = " + basicAuth);
         var options = {
@@ -60,7 +62,7 @@ module.exports = NodeHelper.create({
 
         request(options)
             .then(function (parsedBody) {
-                debug("Token retrived successfully");
+                Log.log("Token retrived successfully from Västtrafik");
                 self.accessToken = {
                     token: parsedBody.access_token,
                     expires: parsedBody.expires_in
@@ -68,7 +70,7 @@ module.exports = NodeHelper.create({
                 self.sendSocketNotification("TOKEN_RECIVED:", self.accessToken);
             })
             .catch(function (err) {
-                log("generateAccessToken failed =" + err);
+                Log.log("generateAccessToken failed =" + err);
                 self.sendSocketNotification("SERVICE_FAILURE", err);
             });
 
