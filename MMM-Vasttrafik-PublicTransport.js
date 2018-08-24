@@ -17,7 +17,10 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
 
     // Default module config.
     defaults: {
-        stopId: "9021014007270000"
+        stopId: "9021014007270000",
+        appKey: "",
+        appSecret: "",
+        debug: false
     },
 
     getScripts: function () {
@@ -32,11 +35,41 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
     start: function () {
         Log.info("Starting module: " + this.name);
         this.updateDom();
+
+        //Send config to node_helper
+        this.sendSocketNotification("CONFIG", this.config);
     },
 
     getDom: function () {
         var wrapper = document.createElement("div");
-        wrapper.innerHTML = "Stop id: " + this.config.stopId;
+        if (this.failure) {
+            wrapper.innerHTML = "Service failure: " + this.failure.resp.StatusCode + ':' + this.failure.resp.Message;
+        }
+        else if (this.accessToken) {
+            wrapper.innerHTML = "Access token retrived: " + this.accessToken.token + ", expiers in: " + this.accessToken.expires_in;
+        }
+        else {
+            wrapper.innerHTML = "App started..."
+        }
+
         return wrapper;
+    },
+
+    // --------------------------------------- Handle socketnotifications
+    socketNotificationReceived: function (notification, payload) {
+        if (notification === "TOKEN_RECIVED") {
+            this.loaded = true;
+            this.failure = undefined;
+            // Handle payload
+            this.accessToken = payload;
+            Log.info("Access token retrived: " + this.accessToken.token + ", expiers in: " + this.accessToken.expires_in);
+            this.updateDom();
+        }
+        if (notification == "SERVICE_FAILURE") {
+            this.loaded = true;
+            this.failure = payload;
+            Log.info("Service failure: " + this.failure.resp.StatusCode + ':' + this.failure.resp.Message);
+            this.updateDom();
+        }
     }
 });
