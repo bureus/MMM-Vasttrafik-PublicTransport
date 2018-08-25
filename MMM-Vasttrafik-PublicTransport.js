@@ -1,5 +1,3 @@
-import { log } from "util";
-
 /* MMM-Vasttrafik-PublicTransport.js - DRAFT
  *
  * Magic Mirror module - Display public transport depature board for Västtrafik/Sweden. 
