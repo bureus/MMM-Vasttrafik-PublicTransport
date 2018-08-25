@@ -36,16 +36,16 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
 
     start: function () {
         var self = this;
-        Log.info("Starting module: " + this.name);
+        Log.log("Starting module: " + this.name);
         self.updateDom();
 
         //Send config to node_helper
-        Log.info("Send configs to node_helper..");
+        Log.log("Send configs to node_helper..");
         self.sendSocketNotification("CONFIG", this.config);
     },
 
     getDom: function () {
-        Log.info("getDom triggered");
+        Log.log("getDom triggered");
         var wrapper = document.createElement("div");
         if (this.failure) {
             wrapper.innerHTML = "Service failure: " + this.failure.resp.StatusCode + ':' + this.failure.resp.Message;
@@ -62,19 +62,19 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
 
     // --------------------------------------- Handle socketnotifications
     socketNotificationReceived: function (notification, payload) {
-        Log.info("socketNotificationReceived: " + notification + ", payload: " + payload);
+        Log.log("socketNotificationReceived: " + notification + ", payload: " + payload);
         if (notification === "TOKEN_RECIVED") {
             this.loaded = true;
             this.failure = undefined;
             // Handle payload
             this.accessToken = payload;
-            Log.info("Access token retrived: " + this.accessToken.token + ", expiers in: " + this.accessToken.expires_in);
+            Log.log("Access token retrived: " + this.accessToken.token + ", expiers in: " + this.accessToken.expires_in);
             this.updateDom();
         }
         if (notification == "SERVICE_FAILURE") {
             this.loaded = true;
             this.failure = payload;
-            Log.info("Service failure: " + this.failure.resp.StatusCode + ':' + this.failure.resp.Message);
+            Log.log("Service failure: " + this.failure.resp.StatusCode + ':' + this.failure.resp.Message);
             this.updateDom();
         }
     }
