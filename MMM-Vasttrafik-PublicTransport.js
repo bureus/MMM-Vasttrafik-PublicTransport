@@ -45,7 +45,7 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
     getDom: function () {
         Log.info("getDom triggered");
         var wrapper = document.createElement("div");
-        wrapper.style = "width: 100%;min-width: 268px;max-height: 100%;background-color: #3c4550;display: flex;flex-direction: column;"
+        wrapper.style = "width: 100%;min-width: 268px;max-width:500px; max-height: 100%;background-color: #3c4550;display: flex;flex-direction: column;"
         if (!this.loaded && !this.failure) {
             wrapper.innerHTML = "<img src='http://seekvectorlogo.com/wp-content/uploads/2018/07/vasttrafik-ab-vector-logo-small.png'></img>"
             return wrapper;
@@ -69,6 +69,7 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
         var span = document.createElement("span");
         span.innerText = "Avgår";
         header.appendChild(span);
+        wrapper.appendChild(header);
 
 
         var table = document.createElement("table");
