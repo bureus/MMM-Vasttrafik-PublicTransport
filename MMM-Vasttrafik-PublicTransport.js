@@ -36,7 +36,7 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
 
     start: function () {
         Log.info("Starting module: " + this.name);
-        self.updateDom();
+        this.updateDom();
 
         //Send config to node_helper
         Log.info("Send configs to node_helper..");

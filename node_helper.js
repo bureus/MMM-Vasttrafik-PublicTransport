@@ -40,7 +40,6 @@ module.exports = NodeHelper.create({
     // --------------------------------------- Get access token
     getAccessToken: function () {
         var self = this;
-        log(self);
         var basicAuth = encode.encode(this.config.appKey + ":" + this.config.appSecret, "base64")
         var options = {
             method: "POST",
