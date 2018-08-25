@@ -1,3 +1,5 @@
+import { log } from "util";
+
 /* MMM-Vasttrafik-PublicTransport.js - DRAFT
  *
  * Magic Mirror module - Display public transport depature board for Västtrafik/Sweden. 
@@ -60,6 +62,7 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
 
     // --------------------------------------- Handle socketnotifications
     socketNotificationReceived: function (notification, payload) {
+        Log.info("socketNotificationReceived: " + notification + ", payload: " + payload);
         if (notification === "TOKEN_RECIVED") {
             this.loaded = true;
             this.failure = undefined;

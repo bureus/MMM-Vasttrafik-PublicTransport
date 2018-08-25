@@ -59,13 +59,11 @@ module.exports = NodeHelper.create({
                     token: reply.access_token,
                     expires: reply.expires_in
                 }
-                log(self);
-                this.sendSocketNotification("TOKEN_RECIVED:", self.accessToken);
                 self.sendSocketNotification("TOKEN_RECIVED:", self.accessToken);
             })
             .catch(function (error) {
                 log("generateAccessToken failed =" + error);
-                this.sendSocketNotification("SERVICE_FAILURE", error);
+                self.sendSocketNotification("SERVICE_FAILURE", error);
             });
 
 
