@@ -60,6 +60,7 @@ module.exports = NodeHelper.create({
                 }
                 log("generateAccessToken completed, sending notification");
                 self.sendSocketNotification("TOKEN_RECIVED", self.accessToken);
+                self.getDeparture();
             })
             .catch(function (error) {
                 log("generateAccessToken failed =" + error);
