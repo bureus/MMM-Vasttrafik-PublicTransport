@@ -77,7 +77,7 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
             row.appendChild(th);
             table.appendChild(row);
             for (var i = 0; i < this.departures.length; i++) {
-                var dep = this.departures[i];
+                var dep = this.departures[i].$;
                 var row = document.createElement("tr");
                 var td = document.createElement("td");
                 td.style = "text-align: center; width: 60px; padding-right: 2px;";
