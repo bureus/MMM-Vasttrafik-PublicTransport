@@ -99,7 +99,14 @@ module.exports = NodeHelper.create({
             request(options)
                 .then(function (response) {
                     log("Depatuers for stop id: " + self.config.stopId + " retrived");
-                    var responseJson = parser.toJson(response);
+                    var parserOpt = {
+                        object: true,
+                        coerce: true,
+                        sanitize: true,
+                        trim: true,
+                        arrayNotation: true
+                    }
+                    var responseJson = parser.toJson(response, parserOpt);
                     var departuers = responseJson.DepartureBoard.Departure;
                     log(departuers);
                     self.sendSocketNotification("DEPARTURES", responseJson.DepartureBoard.Departure);
