@@ -49,7 +49,7 @@ module.exports = NodeHelper.create({
                 "Content-Type": "application/x-www-form-urlencoded",
                 "Authorization": "Basic " + basicAuth,
             },
-            body: "grant_type=client_credentials&scope=123"
+            body: "grant_type=client_credentials&scope=456"
         };
 
         request(options)
@@ -59,6 +59,7 @@ module.exports = NodeHelper.create({
                     token: reply.access_token,
                     expires: reply.expires_in
                 }
+                log("generateAccessToken completed, sending notification");
                 self.sendSocketNotification("TOKEN_RECIVED:", self.accessToken);
             })
             .catch(function (error) {
