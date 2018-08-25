@@ -15,6 +15,7 @@
 const NodeHelper = require("node_helper");
 const request = require("request-promise");
 const encode = require('nodejs-base64-encode');
+var parser = require('xml2json');
 var Url = require("url");
 var Departure = require("./departure.js");
 var debugMe = false;
@@ -60,7 +61,7 @@ module.exports = NodeHelper.create({
                 }
                 log("generateAccessToken completed, sending notification");
                 self.sendSocketNotification("TOKEN_RECIVED", self.accessToken);
-                self.getDeparture();
+                self.getDeparture(self.config.stopId);
             })
             .catch(function (error) {
                 log("generateAccessToken failed =" + error);
@@ -69,9 +70,9 @@ module.exports = NodeHelper.create({
 
 
     },
-    getDeparture: function (stationid, resolve, reject) {
+    getDeparture: function (stopId, resolve, reject) {
         var self = this;
-        log("Getting departures for stop id: " + this.config.stopId);
+        log("Getting departures for stop id: " + stopId);
 
         if (!self.accessToken) {
             self.getAccessToken(); // Get inital access token
@@ -98,8 +99,9 @@ module.exports = NodeHelper.create({
             request(options)
                 .then(function (response) {
                     log("Depatuers for stop id: " + self.config.stopId + " retrived");
-                    var depatuers = response;
+                    var depatuersJson = parser.toJson(response);
                     log(response);
+                    log(depatuersJson);
                 })
                 .catch(function (error) {
                     log("getDeparture failed =" + error);
@@ -356,7 +358,7 @@ module.exports = NodeHelper.create({
             this.config = payload;
             this.started = true;
             debugMe = this.config.debug;
-            self.getDeparture(); // Get it first time
+            self.getDeparture(self.config.stopId); // Get it first time
         };
     }
 });
