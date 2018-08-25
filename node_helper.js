@@ -40,9 +40,8 @@ module.exports = NodeHelper.create({
     // --------------------------------------- Get access token
     getAccessToken: function () {
         var self = this;
-        log("trying to generate access token with key:secret =" + this.config.appKey + ":" + this.config.appSecret);
+        log(self);
         var basicAuth = encode.encode(this.config.appKey + ":" + this.config.appSecret, "base64")
-        debug("base64 encoded credentials = " + basicAuth);
         var options = {
             method: "POST",
             uri: "https://api.vasttrafik.se/token",
@@ -54,19 +53,19 @@ module.exports = NodeHelper.create({
         };
 
         request(options)
-            .then(function (parsedBody) {
-                log("Token retrived successfully from Vasttrafik: " + parsedBody);
-                var reply = JSON.parse(parsedBody);
+            .then(function (body) {
+                var reply = JSON.parse(body);
                 self.accessToken = {
                     token: reply.access_token,
                     expires: reply.expires_in
                 }
-                log("Token" + self.accessToken.token + ", expiers: " + self.accessToken.expires);
+                log(self);
+                this.sendSocketNotification("TOKEN_RECIVED:", self.accessToken);
                 self.sendSocketNotification("TOKEN_RECIVED:", self.accessToken);
             })
-            .catch(function (err) {
-                log("generateAccessToken failed =" + err);
-                self.sendSocketNotification("SERVICE_FAILURE", err);
+            .catch(function (error) {
+                log("generateAccessToken failed =" + error);
+                this.sendSocketNotification("SERVICE_FAILURE", error);
             });
 
 
