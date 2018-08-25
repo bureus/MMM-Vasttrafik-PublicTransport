@@ -55,11 +55,12 @@ module.exports = NodeHelper.create({
 
         request(options)
             .then(function (parsedBody) {
-                log("Token retrived successfully from Västtrafik");
+                log("Token retrived successfully from Vasttrafik");
                 self.accessToken = {
                     token: parsedBody.access_token,
                     expires: parsedBody.expires_in
                 }
+                log("Token" + self.accessToken.token + ", expiers: " + self.accessToken.expires);
                 self.sendSocketNotification("TOKEN_RECIVED:", self.accessToken);
             })
             .catch(function (err) {
