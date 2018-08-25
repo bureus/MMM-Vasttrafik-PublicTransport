@@ -94,6 +94,8 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
                 row.appendChild(td);
                 table.appendChild(row);
             };
+            wrapper.appendChild(table);
+            return wrapper;
         }
     },
 
