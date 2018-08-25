@@ -68,6 +68,36 @@ module.exports = NodeHelper.create({
 
 
     },
+    getDeparture: function (stationid, resolve, reject) {
+        var self = this;
+        log("Getting departures for stop id: " + this.config.stopId);
+        var now = new Date(Date.now());
+        //https://api.vasttrafik.se/bin/rest.exe/v2/departureBoard?id={stopId}&date={date}&time={time}
+        if (self.accessToken) {
+            var options = {
+                method: "GET",
+                uri: "https://api.vasttrafik.se/bin/rest.exe/v2/departureBoard",
+                headers: {
+                    "Authorization": "Basic " + self.accessToken.token,
+                },
+                qs: {
+                    id: this.config.stopId,
+                    date: now.toISOString().substring(0, 10),
+                    time: now.getHours() + ":" + now.getMinutes()
+                },
+                json: true
+            };
+
+            request(options)
+                .then(function (response) {
+                    log("Depatuers for stop id: " + this.config.stopId + " retrived");
+                    var depatuers = response;
+                })
+                .catch(function (error) {
+                    log("getDeparture failed =" + error);
+                });
+        }
+    },
     /*
     // --------------------------------------- Retrive departure info
     getDepartures: function () {
@@ -317,7 +347,7 @@ module.exports = NodeHelper.create({
             this.started = true;
             debugMe = this.config.debug;
             self.getAccessToken(); // Get inital access token
-            //self.getDepartures(); // Get it first time
+            self.getDeparture(); // Get it first time
         };
     }
 });
