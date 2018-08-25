@@ -53,7 +53,7 @@ module.exports = NodeHelper.create({
             body: {
                 some: "grant_type=client_credentials&scope=123"
             },
-            json: true // Automatically stringifies the body to JSON
+            json: false // Automatically stringifies the body to JSON
         };
 
         request(options)
