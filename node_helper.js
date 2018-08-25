@@ -15,7 +15,6 @@
 const NodeHelper = require("node_helper");
 const request = require("request-promise");
 const encode = require('nodejs-base64-encode');
-var HttpsProxyAgent = require("https-proxy-agent");
 var Url = require("url");
 var Departure = require("./departure.js");
 var debugMe = false;
@@ -52,9 +51,9 @@ module.exports = NodeHelper.create({
                 "Authorization": "Basic " + basicAuth,
             },
             body: {
-                some: "grant_type=client_credentials&scope=deviceId"
-            }
-            //json: false // Automatically stringifies the body to JSON
+                some: "grant_type=client_credentials&scope=123"
+            },
+            json: true // Automatically stringifies the body to JSON
         };
 
         request(options)
