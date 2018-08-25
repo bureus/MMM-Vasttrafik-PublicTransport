@@ -71,12 +71,15 @@ module.exports = NodeHelper.create({
     getDeparture: function (stationid, resolve, reject) {
         var self = this;
         log("Getting departures for stop id: " + this.config.stopId);
+
         if (!self.accessToken) {
             self.getAccessToken(); // Get inital access token
         }
+ 
         var now = new Date(Date.now());
         //https://api.vasttrafik.se/bin/rest.exe/v2/departureBoard?id={stopId}&date={date}&time={time}
         if (self.accessToken) {
+            log("Access token retrived: Calling depatureBoard");
             var options = {
                 method: "GET",
                 uri: "https://api.vasttrafik.se/bin/rest.exe/v2/departureBoard",
@@ -99,6 +102,8 @@ module.exports = NodeHelper.create({
                 .catch(function (error) {
                     log("getDeparture failed =" + error);
                 });
+        } else {
+            log("Missing access token..");
         }
     },
     /*
