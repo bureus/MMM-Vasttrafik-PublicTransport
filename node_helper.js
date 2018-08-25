@@ -105,7 +105,7 @@ module.exports = NodeHelper.create({
                         log(result);
                         responseJson = result;
                     });
-                    self.sendSocketNotification("DEPARTURES", responseJson);
+                    self.sendSocketNotification("DEPARTURES", responseJson.DepartureBoard.Departure);
                 })
                 .catch(function (error) {
                     log("getDeparture failed =" + error);
