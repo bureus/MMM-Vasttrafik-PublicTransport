@@ -45,6 +45,7 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
     getDom: function () {
         Log.info("getDom triggered");
         var wrapper = document.createElement("div");
+        wrapper.style = "width: 100%;min-width: 268px;max-height: 100%;background-color: #3c4550;display: flex;flex-direction: column;"
         if (!this.loaded && !this.failure) {
             wrapper.innerHTML = "<img src='http://seekvectorlogo.com/wp-content/uploads/2018/07/vasttrafik-ab-vector-logo-small.png'></img>"
             return wrapper;
@@ -54,12 +55,27 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
             wrapper.className = "dimmed light small";
             return wrapper;
         }
+        var header = document.createElement("div");
+        header.style = "display:flex; min-height: 23px; margin-bottom: 6px; color: #fff;";
+        var span = document.createElement("span");
+        span.innerText = "Linje";
+        header.appendChild(span);
+        var span = document.createElement("span");
+        span.innerText = "Destination";
+        header.appendChild(span);
+        var span = document.createElement("span");
+        span.innerText = "Läge";
+        header.appendChild(span);
+        var span = document.createElement("span");
+        span.innerText = "Avgår";
+        header.appendChild(span);
+
 
         var table = document.createElement("table");
-        table.className = "xsmall";
+        table.style = "color: #f0f8fa;width: 100%;table-layout: fixed;";
 
         if (this.departures) {
-            var row = document.createElement("tr");
+            /*var row = document.createElement("tr");
             var th = document.createElement("th");
             th.innerHTML = "Linje&nbsp;"
             th.className = 'align-left';
@@ -75,13 +91,16 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
             th = document.createElement("th");
             th.innerHTML = "Avgår"
             row.appendChild(th);
-            table.appendChild(row);
+            table.appendChild(row);*/
             for (var i = 0; i < this.departures.length; i++) {
                 var dep = this.departures[i].$;
                 var row = document.createElement("tr");
                 var td = document.createElement("td");
                 td.style = "text-align: center; width: 60px; padding-right: 2px;";
-                td.innerHTML = "<span style='color:'" + dep.fgColor + "';background-color:'" + dep.bgColor + "'>" + dep.sname + "</span>";
+                var span = document.createElement("span");
+                span.style = "color:" + dep.fgColor + ";background-color:" + dep.bgColor;
+                span.textContent = dep.sname;
+                td.appendChild(span);
                 row.appendChild(td);
                 var td = document.createElement("td");
                 td.innerHTML = dep.direction;
