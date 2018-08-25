@@ -69,7 +69,7 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
             Log.info("Access token retrived: " + this.accessToken.token + ", expiers in: " + this.accessToken.expires_in);
             this.updateDom();
         }
-        if (notification == "SERVICE_FAILURE") {
+        else if (notification == "SERVICE_FAILURE") {
             this.loaded = true;
             this.failure = payload;
             Log.info("Service failure: " + this.failure.resp.StatusCode + ':' + this.failure.resp.Message);

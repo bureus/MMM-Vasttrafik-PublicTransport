@@ -59,7 +59,7 @@ module.exports = NodeHelper.create({
                     expires: reply.expires_in
                 }
                 log("generateAccessToken completed, sending notification");
-                self.sendSocketNotification("TOKEN_RECIVED:", self.accessToken);
+                self.sendSocketNotification("TOKEN_RECIVED", self.accessToken);
             })
             .catch(function (error) {
                 log("generateAccessToken failed =" + error);
