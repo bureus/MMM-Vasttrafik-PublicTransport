@@ -35,13 +35,13 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
     },
 
     start: function () {
-        var self = this;
         Log.log("Starting module: " + this.name);
         self.updateDom();
 
         //Send config to node_helper
         Log.log("Send configs to node_helper..");
-        self.sendSocketNotification("CONFIG", this.config);
+        this.sendSocketNotification("CONFIG", this.config);
+        var self = this;
     },
 
     getDom: function () {
