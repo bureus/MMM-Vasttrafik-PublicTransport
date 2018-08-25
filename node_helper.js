@@ -88,7 +88,7 @@ module.exports = NodeHelper.create({
                     "Authorization": "Bearer " + self.accessToken.token,
                 },
                 qs: {
-                    id: this.config.stopId,
+                    id: self.config.stopId,
                     date: now.toISOString().substring(0, 10),
                     time: now.getHours() + ":" + now.getMinutes()
                 },
@@ -97,8 +97,9 @@ module.exports = NodeHelper.create({
 
             request(options)
                 .then(function (response) {
-                    log("Depatuers for stop id: " + this.config.stopId + " retrived");
+                    log("Depatuers for stop id: " + self.config.stopId + " retrived");
                     var depatuers = response;
+                    log(response);
                 })
                 .catch(function (error) {
                     log("getDeparture failed =" + error);
