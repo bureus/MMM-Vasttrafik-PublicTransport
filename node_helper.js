@@ -100,7 +100,7 @@ module.exports = NodeHelper.create({
                 .then(function (response) {
                     log("Depatuers for stop id: " + self.config.stopId + " retrived");
                     var responseJson = parser.toJson(response);
-                    log(responseJson.DepartureBoard);
+                    log(responseJson);
                     self.sendSocketNotification("DEPARTURES", responseJson.DepartureBoard.Departure);
                 })
                 .catch(function (error) {
