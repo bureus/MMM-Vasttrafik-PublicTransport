@@ -60,7 +60,7 @@ module.exports = NodeHelper.create({
                     expires: reply.expires_in
                 }
                 log("generateAccessToken completed, sending notification");
-                self.sendSocketNotification("TOKEN_RECIVED", self.accessToken);
+                //self.sendSocketNotification("TOKEN_RECIVED", self.accessToken);
                 self.getDeparture(self.config.stopId);
             })
             .catch(function (error) {
@@ -99,9 +99,8 @@ module.exports = NodeHelper.create({
             request(options)
                 .then(function (response) {
                     log("Depatuers for stop id: " + self.config.stopId + " retrived");
-                    var depatuersJson = parser.toJson(response);
-                    log(response);
-                    log(depatuersJson);
+                    var responseJson = parser.toJson(response);
+                    self.sendSocketNotification("DEPARTURES", responseJson.DepartureBoard.Departure);
                 })
                 .catch(function (error) {
                     log("getDeparture failed =" + error);
