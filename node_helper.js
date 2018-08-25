@@ -50,10 +50,7 @@ module.exports = NodeHelper.create({
                 "Content-Type": "application/x-www-form-urlencoded",
                 "Authorization": "Basic " + basicAuth,
             },
-            body: {
-                some: "grant_type=client_credentials&scope=123"
-            },
-            json: false // Automatically stringifies the body to JSON
+            body: "grant_type=client_credentials&scope=123"
         };
 
         request(options)
