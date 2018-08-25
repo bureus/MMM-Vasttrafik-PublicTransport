@@ -15,7 +15,7 @@
 const NodeHelper = require("node_helper");
 const request = require("request-promise");
 const encode = require('nodejs-base64-encode');
-var parser = require('xml2json');
+var parser = require('xml2js');
 var Url = require("url");
 var Departure = require("./departure.js");
 var debugMe = false;
@@ -99,14 +99,12 @@ module.exports = NodeHelper.create({
             request(options)
                 .then(function (response) {
                     log("Depatuers for stop id: " + self.config.stopId + " retrived");
-                    var parserOpt = {
-                        object: true,
-                        coerce: true,
-                        sanitize: true,
-                        trim: true,
-                        arrayNotation: true
-                    }
-                    var responseJson = parser.toJson(response, parserOpt);
+                    var responseJson;
+                    var parseString = parser.parseString;
+                    parseString(response, function (err, result) {
+                        log(result);
+                        responseJson = result;
+                    });
                     self.sendSocketNotification("DEPARTURES", responseJson.DepartureBoard[0].Departure);
                 })
                 .catch(function (error) {
