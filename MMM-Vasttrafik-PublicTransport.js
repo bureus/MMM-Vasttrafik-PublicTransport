@@ -43,6 +43,7 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
     },
 
     getDom: function () {
+        Log.info("getDom triggered");
         var wrapper = document.createElement("div");
         if (this.failure) {
             wrapper.innerHTML = "Service failure: " + this.failure.resp.StatusCode + ':' + this.failure.resp.Message;
