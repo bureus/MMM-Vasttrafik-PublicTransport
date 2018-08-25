@@ -55,7 +55,7 @@ module.exports = NodeHelper.create({
 
         request(options)
             .then(function (parsedBody) {
-                log("Token retrived successfully from Vasttrafik");
+                log("Token retrived successfully from Vasttrafik: " + parsedBody);
                 self.accessToken = {
                     token: parsedBody.access_token,
                     expires: parsedBody.expires_in
