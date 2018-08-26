@@ -144,7 +144,7 @@ module.exports = NodeHelper.create({
                 }
                 var index = stop.lines.findIndex(findIndex);
                 log("Deptrack: " + dep.track + ", name: " + dep.sname + ", index: " + index);
-                if (index > 0) {
+                if (index > -1) {
                     var line = stop.lines[index];
                     line.depatuers.push(dep);
                     var depIn = diffInMin(dateObj(dep.rtTime ? dep.rtTime : dep.time), stop.now)
