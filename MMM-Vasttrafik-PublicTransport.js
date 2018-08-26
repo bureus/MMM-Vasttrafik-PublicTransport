@@ -64,7 +64,7 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
             if (this.stop) {
                 var row = document.createElement("tr");
                 var th = document.createElement("th");
-                th.innerText = this.stop.$.serverdate + " " + this.stop.$.servertime+", " + this.stop.$.name;
+                th.innerText = this.stop.serverDatetime + ", " + this.stop.name;
                 th.className = 'align-left';
                 row.appendChild(th);
                 table.appendChild(row);
@@ -85,27 +85,34 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
             th.className = 'align-left';
             row.appendChild(th);
             th = document.createElement("th");
-            th.innerHTML = "Avgår"
+            th.innerHTML = "Nästa"
+            row.appendChild(th);
+            row.appendChild(th);
+            th = document.createElement("th");
+            th.innerHTML = "Därefter"
             row.appendChild(th);
             table.appendChild(row);
-            for (var i = 0; i < this.stop.Departure.length; i++) {
-                var dep = this.stop.Departure[i].$;
+            for (var i = 0; i < this.stop.lines.length; i++) {
+                var line = this.stop.lines[i];
                 var row = document.createElement("tr");
                 var td = document.createElement("td");
                 td.style = "text-align: center; width: 60px; padding-right: 2px;";
                 var span = document.createElement("span");
-                span.style = "color:" + dep.bgColor + ";background-color:" + dep.fgColor;
-                span.textContent = dep.sname;
+                span.style = "color:" + line.color + ";background-color:" + line.bgColor;
+                span.textContent = line.line;
                 td.appendChild(span);
                 row.appendChild(td);
                 var td = document.createElement("td");
-                td.innerHTML = dep.direction;
+                td.innerHTML = line.direction;
                 row.appendChild(td);
                 var td = document.createElement("td");
-                td.innerHTML = dep.track;
+                td.innerHTML = line.track;
                 row.appendChild(td);
                 var td = document.createElement("td");
-                td.innerHTML = dep.rtTime ? dep.rtTime : dep.time;
+                td.innerHTML = line.departureIn;
+                row.appendChild(td);
+                var td = document.createElement("td");
+                td.innerHTML = line.nextDeparture;
                 row.appendChild(td);
                 table.appendChild(row);
             };
@@ -117,7 +124,7 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
     // --------------------------------------- Handle socketnotifications
     socketNotificationReceived: function (notification, payload) {
         Log.info("socketNotificationReceived: " + notification + ", payload: " + payload);
-        if (notification === "DEPARTURES") {
+        if (notification === "STOPS") {
             this.loaded = true;
             this.failure = undefined;
             // Handle payload

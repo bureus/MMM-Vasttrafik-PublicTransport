@@ -75,7 +75,7 @@ module.exports = NodeHelper.create({
         if (!self.accessToken) {
             self.getAccessToken(); // Get inital access token
         }
- 
+
         var now = new Date(Date.now());
         //https://api.vasttrafik.se/bin/rest.exe/v2/departureBoard?id={stopId}&date={date}&time={time}
         if (self.accessToken) {
@@ -102,8 +102,9 @@ module.exports = NodeHelper.create({
                     parseString(response, function (err, result) {
                         responseJson = result;
                     });
-                    responseJson.DepartureBoard.$ = responseJson.DepartureBoard.Departure[0].$.stop;
-                    self.sendSocketNotification("DEPARTURES", responseJson.DepartureBoard);
+                    var stop = getStop(responseJson.DepartureBoard);
+                    log(stop);
+                    self.sendSocketNotification("STOPS", stop);
                 })
                 .catch(function (error) {
                     log("getDeparture failed =" + error);
@@ -112,13 +113,83 @@ module.exports = NodeHelper.create({
             log("Missing access token..");
         }
     },
+
+    getStop: function (depatureBoard) {
+        var self = this;
+        var stop = {
+            name: depatureBoard.Departure[0].$.stop,
+            serverDatetime: depatureBoard.$.serverdate + " " + depatureBoard.$.servertime,
+            lines: [],
+            now: new Date(Date.now())
+        };
+
+        for (var i = 0; i < depatureBoard.Departure.length; i++) {
+            var dep = depatureBoard.Departure[i].$;
+            if (stop.lines.length === 0) {
+                var line = {
+                    direction: dep.direction,
+                    line: dep.sname,
+                    departureIn: diffInMin(self.dateObj(dep.rtTime ? dep.rtTime : dep.time), stop.now),
+                    color: dep.bgColor,
+                    bgColor: dep.fgColor,
+                    track: dep.track,
+                    depatuers: [dep],
+                    type: dep.type
+                };
+                stop.lines.push(line);
+            }
+            else {
+                function findIndex(line) {
+                    return line.direction == dep.direction && line.line == dep.sname;
+                }
+                var index = stop.lines.findIndex(findIndex);
+                if (index > 0) {
+                    var line = stop.lines[index];
+                    line.depatuers.push(dep);
+                    var depIn = diffInMin(self.dateObj(dep.rtTime ? dep.rtTime : dep.time), stop.now)
+                    if (line.departureIn > depIn) {
+                        var depInOld = line.departureIn;
+                        line.departureIn = depIn;
+                        if (!line.nextDeparture) {
+                            line.nextDeparture = depInOld;
+                        }
+                        else if (line.nextDeparture > depInOld) {
+                            line.nextDeparture == depInOld
+                        }
+                    }
+                    else if (!line.nextDeparture) {
+                        line.nextDeparture = depIn;
+                    }
+                    else if (line.nextDeparture > depIn) {
+                        line.nextDeparture = depIn;
+                    }
+                    stop.lines[index] = line;
+                }
+                else {
+                    var line = {
+                        direction: dep.direction,
+                        line: dep.sname,
+                        departureIn: diffInMin(self.dateObj(dep.rtTime ? dep.rtTime : dep.time), stop.now),
+                        color: dep.bgColor,
+                        bgColor: dep.fgColor,
+                        track: dep.track,
+                        depatuers: [dep],
+                        type: dep.type
+                    };
+                    stop.lines.push(line);
+                }
+
+            }
+        }
+        return stop;
+    },
     /*
     // --------------------------------------- Retrive departure info
     getDepartures: function () {
         var self = this;
-
+    
         clearInterval(this.updatetimer); // Clear the timer so that we can set it again
-
+    
         debug("stationid is array=" + Array.isArray(this.config.stationid));
         var Proms = [];
         // Loop over all stations
@@ -130,7 +201,7 @@ module.exports = NodeHelper.create({
             console.log(P);
             Proms.push(P);
         });
-
+    
         Promise.all(Proms).then(CurrentDeparturesArray => {
             debug('all promises resolved ' + CurrentDeparturesArray);
             self.sendSocketNotification('DEPARTURES', CurrentDeparturesArray); // Send departures to module
@@ -138,10 +209,10 @@ module.exports = NodeHelper.create({
             debug('One or more promises rejected ' + reason);
             self.sendSocketNotification('SERVICE_FAILURE', reason);
         });
-
+    
         self.scheduleUpdate(); // reinitiate the timer
     },
-
+    
     // --------------------------------------- Get departures for one station
     // The CurrentDepartures object holds this data
     //  CurrentDepartures = {
@@ -153,7 +224,7 @@ module.exports = NodeHelper.create({
     getDeparture: function (stationid, resolve, reject) {
         log('Getting departures for station id ' + stationid);
         var self = this;
-
+    
         // http://api.sl.se/api2/realtimedeparturesV4.<FORMAT>?key=<DIN API NYCKEL>&siteid=<SITEID>&timewindow=<TIMEWINDOW>
         var transport = (this.config.SSL ? 'https' : 'http');
         var opt = {
@@ -187,7 +258,7 @@ module.exports = NodeHelper.create({
                     self.addDepartures(departures, resp.ResponseData.Trams);
                     self.addDepartures(departures, resp.ResponseData.Ships);
                     //console.log(self.departures);
-
+    
                     // Sort on ExpectedDateTime
                     for (var ix = 0; ix < departures.length; ix++) {
                         if (departures[ix] !== undefined) {
@@ -195,7 +266,7 @@ module.exports = NodeHelper.create({
                         }
                     }
                     //console.log(departures);
-
+    
                     // Add the sorted arrays into one array
                     var temp = []
                     for (var ix = 0; ix < departures.length; ix++) {
@@ -206,12 +277,12 @@ module.exports = NodeHelper.create({
                         }
                     }
                     //console.log(temp);
-
+    
                     // TODO:Handle resp.ResponseData.StopPointDeviations
                     CurrentDepartures.departures = temp;
                     log('Found ' + CurrentDepartures.departures.length + ' DEPARTURES for station id=' + stationid);
                     resolve(CurrentDepartures);
-
+    
                 } else {
                     log('Something went wrong: station id=' + stationid + ' ' + resp.StatusCode + ': ' + resp.Message);
                     reject(resp);
@@ -222,7 +293,7 @@ module.exports = NodeHelper.create({
                 reject({ resp: { StatusCode: 600, Message: err } });
             });
     },
-
+    
     // --------------------------------------- Add departures to our departures array
     addDepartures: function (departures, depArray) {
         for (var ix = 0; ix < depArray.length; ix++) {
@@ -242,7 +313,7 @@ module.exports = NodeHelper.create({
             }
         }
     },
-
+    
     // --------------------------------------- Are we asking for this direction
     isWantedDirection: function (dir) {
         if (this.config.direction !== undefined && this.config.direction != '') {
@@ -250,7 +321,7 @@ module.exports = NodeHelper.create({
         }
         return true;
     },
-
+    
     // --------------------------------------- If we want to change direction number on a line
     fixJourneyDirection: function (dep) {
         if (this.config.lines !== undefined && this.config.direction !== undefined) {
@@ -273,7 +344,7 @@ module.exports = NodeHelper.create({
         }
         return dep;
     },
-
+    
     // --------------------------------------- Are we asking for this direction
     isWantedLine: function (line) {
         if (this.config.lines !== undefined) {
@@ -286,7 +357,7 @@ module.exports = NodeHelper.create({
         } else return true; // Its undefined = we want all lines
         return false;
     },
-
+    
     // --------------------------------------- Get the line number of a lines entry
     getLineNumber: function (ix) {
         var wasarray = false;
@@ -298,7 +369,7 @@ module.exports = NodeHelper.create({
         //debug("IX: "+ ix + " LL:" + ll + " wasarray " + wasarray);                            
         return ll;
     },
-
+    
     // --------------------------------------- Figure out the next update time
     getNextUpdateInterval: function () {
         if (this.config.highUpdateInterval === undefined) return this.config.updateInterval;
@@ -309,7 +380,7 @@ module.exports = NodeHelper.create({
             return this.config.updateInterval;
         }
         if (!Array.isArray(this.config.highUpdateInterval.times)) throw new Error("highUpdateInterval.times is not an array")
-
+    
         //Check which interval we are in and return the proper timer
         for (var ix = 0; ix < this.config.highUpdateInterval.times.length; ix++) {
             var time = this.config.highUpdateInterval.times[ix];
@@ -317,7 +388,7 @@ module.exports = NodeHelper.create({
         }
         return this.config.updateInterval;
     },
-
+    
     // --------------------------------------- Check if now is in this time
     isBetween: function (days, start, stop) {
         var now = new Date();
@@ -336,7 +407,7 @@ module.exports = NodeHelper.create({
         }
         return false;
     },
-
+    
     // --------------------------------------- Check if now is between these times
     isTimeBetween: function (start, stop) {
         var now = new Date();
@@ -347,7 +418,7 @@ module.exports = NodeHelper.create({
             st = en;        // and swap the dates
             en = temp;
         }
-
+    
         return now < en && now > st
     },*/
 
@@ -378,6 +449,11 @@ function dynamicSort(property) {
         var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
         return result * sortOrder;
     }
+}
+
+function diffInMin(date1, date2) {
+    var diff = Math.abs(date2 - date1);
+    return Math.floor((diff / 1000) / 60);
 }
 
 // --------------------------------------- Create a date object with the time in timeStr (hh:mm)
