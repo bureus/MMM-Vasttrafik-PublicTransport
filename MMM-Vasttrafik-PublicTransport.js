@@ -17,7 +17,7 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
 
     // Default module config.
     defaults: {
-        stopId: "9021014007270000",
+        stopIds: ["9021014007270000", "9021014004310000"],
         appKey: "",
         appSecret: "",
         debug: false
@@ -25,11 +25,6 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
 
     getScripts: function () {
         return ["moment.js"];
-    },
-
-    getHeader: function () {
-        var stopId = this.config.stopId;
-        return this.data.header + " " + stopId;
     },
 
     start: function () {
@@ -54,68 +49,65 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
             wrapper.className = "dimmed light small";
             return wrapper;
         }
-
-        var table = document.createElement("table");
-        table.className = "xsmall";
-
-        if (this.stop) {
-
-            if (this.stop) {
+        if (this.stops) {
+            for (var i = 0; i < this.stops.length; i++) {
+                var stop = this.stops[i];
+                var header = document.createElement("div");
+                header.innerHTML = " <b>" + stop.name + "</b>";
+                header.className = "light small";
+                wrapper.appendChild(header);
+                var table = document.createElement("table");
+                table.className = "small";
                 var row = document.createElement("tr");
                 var th = document.createElement("th");
-                th.innerText = this.stop.serverDatetime + ", " + this.stop.name;
+                th.innerText = "Linje"
                 th.className = 'align-left';
                 row.appendChild(th);
+                th = document.createElement("th");
+                th.innerHTML = ""
+                th.className = 'align-left';
+                row.appendChild(th);
+                th = document.createElement("th");
+                th.innerText = "Nästa"
+                row.appendChild(th);
+                row.appendChild(th);
+                th = document.createElement("th");
+                th.innerText = "Därefter"
+                row.appendChild(th);
                 table.appendChild(row);
+                th = document.createElement("th");
+                th.innerText = "Läge"
+                th.className = 'align-left';
+                row.appendChild(th);
+                for (var n = 0; n < stop.lines.length; n++) {
+                    var line = stop.lines[n];
+                    var row = document.createElement("tr");
+                    var td = document.createElement("td");
+                    td.style = "text-align: center; width: 40px; padding-right: 2px; background-color:" + line.bgColor;
+                    var span = document.createElement("span");
+                    span.style = "color:" + line.color;
+                    span.textContent = line.line;
+                    td.appendChild(span);
+                    row.appendChild(td);
+                    var td = document.createElement("td");
+                    td.innerHTML = line.direction;
+                    row.appendChild(td);
+                    var td = document.createElement("td");
+                    td.innerHTML = line.departureIn;
+                    td.style = "text-align: center;"
+                    row.appendChild(td);
+                    var td = document.createElement("td");
+                    td.innerHTML = line.nextDeparture;
+                    td.style = "text-align: center;"
+                    row.appendChild(td);
+                    var td = document.createElement("td");
+                    td.style = "text-align: center;"
+                    td.innerHTML = line.track;
+                    row.appendChild(td);
+                    table.appendChild(row);
+                };
+                wrapper.appendChild(table);
             }
-
-
-            var row = document.createElement("tr");
-            var th = document.createElement("th");
-            th.innerHTML = "Linje&nbsp;"
-            th.className = 'align-left';
-            row.appendChild(th);
-            th = document.createElement("th");
-            th.innerHTML = "Destination"
-            th.className = 'align-left';
-            row.appendChild(th);
-            th = document.createElement("th");
-            th.innerHTML = "Läge"
-            th.className = 'align-left';
-            row.appendChild(th);
-            th = document.createElement("th");
-            th.innerHTML = "Nästa"
-            row.appendChild(th);
-            row.appendChild(th);
-            th = document.createElement("th");
-            th.innerHTML = "Därefter"
-            row.appendChild(th);
-            table.appendChild(row);
-            for (var i = 0; i < this.stop.lines.length; i++) {
-                var line = this.stop.lines[i];
-                var row = document.createElement("tr");
-                var td = document.createElement("td");
-                td.style = "text-align: center; width: 60px; padding-right: 2px;";
-                var span = document.createElement("span");
-                span.style = "color:" + line.color + ";background-color:" + line.bgColor;
-                span.textContent = line.line;
-                td.appendChild(span);
-                row.appendChild(td);
-                var td = document.createElement("td");
-                td.innerHTML = line.direction;
-                row.appendChild(td);
-                var td = document.createElement("td");
-                td.innerHTML = line.track;
-                row.appendChild(td);
-                var td = document.createElement("td");
-                td.innerHTML = line.departureIn;
-                row.appendChild(td);
-                var td = document.createElement("td");
-                td.innerHTML = line.nextDeparture;
-                row.appendChild(td);
-                table.appendChild(row);
-            };
-            wrapper.appendChild(table);
             return wrapper;
         }
     },
@@ -127,14 +119,16 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
             this.loaded = true;
             this.failure = undefined;
             // Handle payload
-            this.stop = payload;
+            this.stops = payload;
             this.updateDom();
         }
         else if (notification == "SERVICE_FAILURE") {
             this.loaded = true;
             this.failure = payload;
-            Log.info("Service failure: " + this.failure.resp.StatusCode + ':' + this.failure.resp.Message);
-            this.updateDom();
+            if (payload) {
+                Log.info("Service failure: " + this.failure.resp.StatusCode + ':' + this.failure.resp.Message);
+                this.updateDom();
+            }
         }
     }
 });
