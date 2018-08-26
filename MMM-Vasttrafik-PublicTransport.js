@@ -55,28 +55,23 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
             wrapper.className = "dimmed light small";
             return wrapper;
         }
-        var header = document.createElement("div");
-        header.style = "display:flex; min-height: 23px; margin-bottom: 6px; color: #fff;";
-        var span = document.createElement("span");
-        span.innerText = "Linje";
-        header.appendChild(span);
-        var span = document.createElement("span");
-        span.innerText = "Destination";
-        header.appendChild(span);
-        var span = document.createElement("span");
-        span.innerText = "Läge";
-        header.appendChild(span);
-        var span = document.createElement("span");
-        span.innerText = "Avgår";
-        header.appendChild(span);
-        wrapper.appendChild(header);
-
 
         var table = document.createElement("table");
         table.style = "color: #f0f8fa;width: 100%;table-layout: fixed;";
 
-        if (this.departures) {
-            /*var row = document.createElement("tr");
+        if (this.stop) {
+
+            if (this.stop) {
+                var row = document.createElement("tr");
+                var th = document.createElement("th");
+                th.innerText = "Station";
+                th.className = 'align-left';
+                row.appendChild(th);
+                table.appendChild(row);
+            }
+
+
+            var row = document.createElement("tr");
             var th = document.createElement("th");
             th.innerHTML = "Linje&nbsp;"
             th.className = 'align-left';
@@ -92,14 +87,14 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
             th = document.createElement("th");
             th.innerHTML = "Avgår"
             row.appendChild(th);
-            table.appendChild(row);*/
-            for (var i = 0; i < this.departures.length; i++) {
-                var dep = this.departures[i].$;
+            table.appendChild(row);
+            for (var i = 0; i < this.stop.Departure.length; i++) {
+                var dep = this.stop.Departure[i].$;
                 var row = document.createElement("tr");
                 var td = document.createElement("td");
                 td.style = "text-align: center; width: 60px; padding-right: 2px;";
                 var span = document.createElement("span");
-                span.style = "color:" + dep.fgColor + ";background-color:" + dep.bgColor;
+                span.style = "color:" + dep.bgColor + ";background-color:" + dep.fgColor;
                 span.textContent = dep.sname;
                 td.appendChild(span);
                 row.appendChild(td);
@@ -126,7 +121,7 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
             this.loaded = true;
             this.failure = undefined;
             // Handle payload
-            this.departures = payload;
+            this.stop = payload;
             Log.info("");
             this.updateDom();
         }

@@ -24,7 +24,6 @@ module.exports = NodeHelper.create({
 
     // --------------------------------------- Start the helper
     start: function () {
-        //Log.info('Starting helper: '+ this.name);
         log('Starting helper: ' + this.name);
         this.started = false;
     },
@@ -60,7 +59,6 @@ module.exports = NodeHelper.create({
                     expires: reply.expires_in
                 }
                 log("generateAccessToken completed, sending notification");
-                //self.sendSocketNotification("TOKEN_RECIVED", self.accessToken);
                 self.getDeparture(self.config.stopId);
             })
             .catch(function (error) {
@@ -102,10 +100,9 @@ module.exports = NodeHelper.create({
                     var responseJson;
                     var parseString = parser.parseString;
                     parseString(response, function (err, result) {
-                        log(result);
                         responseJson = result;
                     });
-                    self.sendSocketNotification("DEPARTURES", responseJson.DepartureBoard.Departure);
+                    self.sendSocketNotification("DEPARTURES", responseJson.DepartureBoard);
                 })
                 .catch(function (error) {
                     log("getDeparture failed =" + error);
