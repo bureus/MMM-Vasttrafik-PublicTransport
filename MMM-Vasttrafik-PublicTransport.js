@@ -57,14 +57,14 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
         }
 
         var table = document.createElement("table");
-        table.style = "color: #f0f8fa;width: 100%;table-layout: fixed;";
+        table.className = "xsmall";
 
         if (this.stop) {
 
             if (this.stop) {
                 var row = document.createElement("tr");
                 var th = document.createElement("th");
-                th.innerText = "Station";
+                th.innerText = this.stop.$.serverdate + " " + this.stop.$.servertime+", " + this.stop.$.name;
                 th.className = 'align-left';
                 row.appendChild(th);
                 table.appendChild(row);
