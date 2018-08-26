@@ -31,10 +31,9 @@ module.exports = NodeHelper.create({
     // --------------------------------------- Schedule a departure update
     scheduleUpdate: function () {
         var self = this;
-        //debug('scheduleUpdate=' + self.getNextUpdateInterval());
-        /*this.updatetimer = setInterval(function () { // This timer is saved in uitimer so that we can cancel it
-            self.getDepartures();
-        }, self.getNextUpdateInterval());*/
+        this.updatetimer = setInterval(function () { // This timer is saved in uitimer so that we can cancel it
+            self.getDeparture(self.config.stopId);
+        }, 60000);
     },
 
     // --------------------------------------- Get access token
@@ -433,6 +432,8 @@ module.exports = NodeHelper.create({
             this.started = true;
             debugMe = this.config.debug;
             self.getDeparture(self.config.stopId); // Get it first time
+            if (!self.updatetimer)
+                self.scheduleUpdate();
         };
     }
 });
