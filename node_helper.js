@@ -102,7 +102,7 @@ module.exports = NodeHelper.create({
                     parseString(response, function (err, result) {
                         responseJson = result;
                     });
-                    var stop = getStop(responseJson.DepartureBoard);
+                    var stop = self.getStop(responseJson.DepartureBoard);
                     log(stop);
                     self.sendSocketNotification("STOPS", stop);
                 })
