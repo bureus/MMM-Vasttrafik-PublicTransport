@@ -139,10 +139,11 @@ module.exports = NodeHelper.create({
                 stop.lines.push(line);
             }
             else {
-                function findIndex(line) {
-                    return line.direction == dep.direction && line.line == dep.sname;
+                function findIndex(element) {
+                    return element.track == dep.track && element.line == dep.sname;
                 }
                 var index = stop.lines.findIndex(findIndex);
+                log("Deptrack: " + dep.track + ", name: " + dep.sname + ", index: " + index);
                 if (index > 0) {
                     var line = stop.lines[index];
                     line.depatuers.push(dep);
