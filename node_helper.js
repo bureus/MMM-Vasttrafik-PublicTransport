@@ -129,7 +129,7 @@ module.exports = NodeHelper.create({
                 var line = {
                     direction: dep.direction,
                     line: dep.sname,
-                    departureIn: diffInMin(self.dateObj(dep.rtTime ? dep.rtTime : dep.time), stop.now),
+                    departureIn: diffInMin(dateObj(dep.rtTime ? dep.rtTime : dep.time), stop.now),
                     color: dep.bgColor,
                     bgColor: dep.fgColor,
                     track: dep.track,
@@ -146,7 +146,7 @@ module.exports = NodeHelper.create({
                 if (index > 0) {
                     var line = stop.lines[index];
                     line.depatuers.push(dep);
-                    var depIn = diffInMin(self.dateObj(dep.rtTime ? dep.rtTime : dep.time), stop.now)
+                    var depIn = diffInMin(dateObj(dep.rtTime ? dep.rtTime : dep.time), stop.now)
                     if (line.departureIn > depIn) {
                         var depInOld = line.departureIn;
                         line.departureIn = depIn;
@@ -169,7 +169,7 @@ module.exports = NodeHelper.create({
                     var line = {
                         direction: dep.direction,
                         line: dep.sname,
-                        departureIn: diffInMin(self.dateObj(dep.rtTime ? dep.rtTime : dep.time), stop.now),
+                        departureIn: diffInMin(dateObj(dep.rtTime ? dep.rtTime : dep.time), stop.now),
                         color: dep.bgColor,
                         bgColor: dep.fgColor,
                         track: dep.track,
