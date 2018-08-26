@@ -107,6 +107,8 @@ module.exports = NodeHelper.create({
                 })
                 .catch(function (error) {
                     log("getDeparture failed =" + error);
+                    if (error.statusCode == 401)
+                        self.getAccessToken();
                 });
         } else {
             log("Missing access token..");
@@ -142,7 +144,6 @@ module.exports = NodeHelper.create({
                     return element.track == dep.track && element.line == dep.sname;
                 }
                 var index = stop.lines.findIndex(findIndex);
-                log("Deptrack: " + dep.track + ", name: " + dep.sname + ", index: " + index);
                 if (index > -1) {
                     var line = stop.lines[index];
                     line.depatuers.push(dep);

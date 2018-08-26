@@ -129,7 +129,6 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
             this.failure = undefined;
             // Handle payload
             this.stop = payload;
-            Log.info("");
             this.updateDom();
         }
         else if (notification == "SERVICE_FAILURE") {
