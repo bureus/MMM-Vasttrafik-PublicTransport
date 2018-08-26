@@ -1,4 +1,4 @@
-/* MMM-Vasttrafik-PublicTransport.js - DRAFT
+ï»¿/* MMM-Vasttrafik-PublicTransport.js - DRAFT
  *
  * Magic Mirror module - Display public transport depature board for Västtrafik/Sweden. 
  * This module use the API's provided by Västtrafik (https://developer.vasttrafik.se).
@@ -39,6 +39,12 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
 
     getDom: function () {
         Log.info("getDom triggered");
+        var header_titles = {
+            line: "Linje",
+            next: "NÃ¤sta",
+            upcoming: "DÃ¤refter",
+            track: "LÃ¤ge"
+        }
         var wrapper = document.createElement("div");
         if (!this.loaded && !this.failure) {
             wrapper.innerHTML = "<img src='http://seekvectorlogo.com/wp-content/uploads/2018/07/vasttrafik-ab-vector-logo-small.png'></img>"
@@ -60,7 +66,7 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
                 table.className = "small";
                 var row = document.createElement("tr");
                 var th = document.createElement("th");
-                th.innerText = "Linje"
+                th.innerHTML = header_titles.line;
                 th.className = 'align-left';
                 row.appendChild(th);
                 th = document.createElement("th");
@@ -68,15 +74,15 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
                 th.className = 'align-left';
                 row.appendChild(th);
                 th = document.createElement("th");
-                th.innerText = "Nästa"
+                th.innerText = header_titles.next;
                 row.appendChild(th);
                 row.appendChild(th);
                 th = document.createElement("th");
-                th.innerText = "Därefter"
+                th.innerHTML = header_titles.upcoming;
                 row.appendChild(th);
                 table.appendChild(row);
                 th = document.createElement("th");
-                th.innerText = "Läge"
+                th.innerHTML = header_titles.track;
                 th.className = 'align-left';
                 row.appendChild(th);
                 for (var n = 0; n < stop.lines.length; n++) {

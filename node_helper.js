@@ -95,6 +95,8 @@ module.exports = NodeHelper.create({
             log('One or more promises rejected ' + reason);
             self.sendSocketNotification('SERVICE_FAILURE', reason);
         });
+
+        self.scheduleUpdate(); // reinitiate the timer
     },
 
     addStop: function (stop) {
