@@ -1,0 +1,13 @@
+﻿.departure-designation {
+    border-radius: 4px;
+    text-align: center;
+    width: 40px;
+    margin: 2px;
+}
+.departure-board td:nth-child(-n+2) {
+    min-width: 40px !important;
+}
+
+.departure-board td {
+    min-width: 70px;
+}

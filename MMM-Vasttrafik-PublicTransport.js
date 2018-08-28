@@ -1,7 +1,7 @@
 ï»¿/* MMM-Vasttrafik-PublicTransport.js - DRAFT
  *
- * Magic Mirror module - Display public transport depature board for Västtrafik/Sweden. 
- * This module use the API's provided by Västtrafik (https://developer.vasttrafik.se).
+ * Magic Mirror module - Display public transport depature board for Vï¿½sttrafik/Sweden. 
+ * This module use the API's provided by Vï¿½sttrafik (https://developer.vasttrafik.se).
  * 
  * Magic Mirror
  * Module: MMM-Vasttrafik-PublicTransport
@@ -9,7 +9,7 @@
  * Magic Mirror By Michael Teeuw http://michaelteeuw.nl
  * MIT Licensed.
  * 
- * Module MMM-Vasttrafik-PublicTransport By Bure Råman Vinnå
+ * Module MMM-Vasttrafik-PublicTransport By Bure Rï¿½man Vinnï¿½
  * 
  */
 
@@ -20,11 +20,20 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
         stopIds: ["9021014007270000", "9021014004310000"],
         appKey: "",
         appSecret: "",
-        debug: false
+        debug: false,
+        sortBy: "track"
     },
 
     getScripts: function () {
-        return ["moment.js"];
+        return [
+            "moment.js"
+        ];
+    },
+
+    getStyles: function () {
+        return [
+            this.file('/css/board.css')
+        ]
     },
 
     start: function () {
@@ -51,7 +60,7 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
             return wrapper;
         }
         if (this.failure) {
-            wrapper.innerHTML = "Connection to Västtrafik failed. Please review logs";
+            wrapper.innerHTML = "Connection to VÃ¤sttrafik failed. Please review logs";
             wrapper.className = "dimmed light small";
             return wrapper;
         }
@@ -63,7 +72,7 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
                 header.className = "light small";
                 wrapper.appendChild(header);
                 var table = document.createElement("table");
-                table.className = "small";
+                table.className = "small departure-board";
                 var row = document.createElement("tr");
                 var th = document.createElement("th");
                 th.innerHTML = header_titles.line;
@@ -88,22 +97,26 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
                 for (var n = 0; n < stop.lines.length; n++) {
                     var line = stop.lines[n];
                     var row = document.createElement("tr");
+                    row.style="min-widtgh:50px"
                     var td = document.createElement("td");
-                    td.style = "text-align: center; width: 40px; padding-right: 2px; background-color:" + line.bgColor;
+                    var div = document.createElement("div");
+                    div.className = "departure-designation";
+                    div.style = "background-color:" + line.bgColor;
                     var span = document.createElement("span");
                     span.style = "color:" + line.color;
                     span.textContent = line.line;
-                    td.appendChild(span);
+                    div.appendChild(span);
+                    td.appendChild(div);
                     row.appendChild(td);
                     var td = document.createElement("td");
                     td.innerHTML = line.direction;
                     row.appendChild(td);
                     var td = document.createElement("td");
-                    td.innerHTML = line.departureIn;
+                    td.innerHTML = getDisplayTime(line.departureIn);
                     td.style = "text-align: center;"
                     row.appendChild(td);
                     var td = document.createElement("td");
-                    td.innerHTML = line.nextDeparture;
+                    td.innerHTML = getDisplayTime(line.nextDeparture);
                     td.style = "text-align: center;"
                     row.appendChild(td);
                     var td = document.createElement("td");
@@ -138,3 +151,20 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
         }
     }
 });
+
+//
+// Utilities
+//
+
+function getDisplayTime(min) {
+    if (min == undefined) {
+        return "-"
+    }
+    else if (min == 0) {
+        return "Nu";
+    }
+    else {
+        return min;
+    }
+    
+}

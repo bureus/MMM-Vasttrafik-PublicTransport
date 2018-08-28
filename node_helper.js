@@ -218,6 +218,7 @@ module.exports = NodeHelper.create({
 
             }
         }
+        stop.lines = sortByKey(stop.lines, self.config.sortBy);
         return stop;
     },
     // --------------------------------------- Handle notifocations
@@ -239,16 +240,11 @@ module.exports = NodeHelper.create({
 //
 // Utilities
 //
-function dynamicSort(property) {
-    var sortOrder = 1;
-    if (property[0] === "-") {
-        sortOrder = -1;
-        property = property.substr(1);
-    }
-    return function (a, b) {
-        var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
-        return result * sortOrder;
-    }
+function sortByKey(array, key) {
+    return array.sort(function (a, b) {
+        var x = a[key]; var y = b[key];
+        return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+    });
 }
 
 function diffInMin(date1, date2) {
