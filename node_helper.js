@@ -1,7 +1,7 @@
 /* MMM-Vasttrafik-PublicTransport.js - DRAFT
  *
  * Magic Mirror module - Display public transport depature board for Västtrafik/Sweden. 
- * This module use the API's provided by Västtrafik (https://developer.vasttrafik.se).
+ * This module use the API"s provided by Västtrafik (https://developer.vasttrafik.se).
  * 
  * Magic Mirror
  * Module: MMM-Vasttrafik-PublicTransport
@@ -14,8 +14,8 @@
  */
 const NodeHelper = require("node_helper");
 const request = require("request-promise");
-const encode = require('nodejs-base64-encode');
-var parser = require('xml2js');
+const encode = require("nodejs-base64-encode");
+var parser = require("xml2js");
 var Url = require("url");
 var debugMe = false;
 
@@ -23,7 +23,7 @@ module.exports = NodeHelper.create({
 
     // --------------------------------------- Start the helper
     start: function () {
-        log('Starting helper: ' + this.name);
+        log("Starting helper: " + this.name);
         this.started = false;
         this.stops = [];
     },
@@ -33,7 +33,7 @@ module.exports = NodeHelper.create({
         var self = this;
         this.updatetimer = setInterval(function () { // This timer is saved in uitimer so that we can cancel it
             self.getStops();
-        }, 20000);
+        }, this.config.refreshRate);
     },
 
     // --------------------------------------- Get access token
@@ -57,7 +57,7 @@ module.exports = NodeHelper.create({
                     token: reply.access_token,
                     expires: reply.expires_in
                 }
-                log("generateAccessToken completed");
+                debug("generateAccessToken completed");
             })
             .catch(function (error) {
                 log("generateAccessToken failed =" + error);
@@ -75,24 +75,24 @@ module.exports = NodeHelper.create({
 
         clearInterval(this.updatetimer); // Clear the timer so that we can set it again
 
-        log("stationid is array=" + Array.isArray(this.config.stopIds));
+        debug("stationid is array=" + Array.isArray(this.config.stopIds));
         var Proms = [];
         // Loop over all stations
         this.config.stopIds.forEach(stopId => {
             var P = new Promise((resolve, reject) => {
                 self.getDeparture(stopId, resolve, reject);
             });
-            log('Pushing promise for station ' + stopId);
+            debug("Pushing promise for stop " + stopId);
             console.log(P);
             Proms.push(P);
         });
 
         Promise.all(Proms).then(CurrentDeparturesArray => {
-            log('all promises resolved ' + CurrentDeparturesArray);
-            self.sendSocketNotification('STOPS', CurrentDeparturesArray); // Send departures to module
+            debug("all promises resolved " + CurrentDeparturesArray);
+            self.sendSocketNotification("STOPS", CurrentDeparturesArray); // Send departures to module
         }).catch(reason => {
-            log('One or more promises rejected ' + reason);
-            self.sendSocketNotification('SERVICE_FAILURE', reason);
+            log("One or more promises rejected " + reason);
+            self.sendSocketNotification("SERVICE_FAILURE", reason);
         });
 
         self.scheduleUpdate(); // reinitiate the timer
@@ -100,18 +100,18 @@ module.exports = NodeHelper.create({
 
     addStop: function (stop) {
         var self = this;
-        log("adding stop to stops: " + stop.name);
+        debug("adding stop to stops: " + stop.name);
         self.stops.push(stop);
     },
 
     getDeparture: function (stopId, resolve, reject) {
         var self = this;
         var CurrentStop = {};
-        log("Getting departures for stop id: " + stopId);
+        debug("Getting departures for stop id: " + stopId);
         var now = new Date(Date.now());
         //https://api.vasttrafik.se/bin/rest.exe/v2/departureBoard?id={stopId}&date={date}&time={time}
         if (self.accessToken) {
-            log("Access token retrived: Calling depatureBoard");
+            debug("Access token retrived: Calling depatureBoard");
             var options = {
                 method: "GET",
                 uri: "https://api.vasttrafik.se/bin/rest.exe/v2/departureBoard",
@@ -128,14 +128,14 @@ module.exports = NodeHelper.create({
 
             request(options)
                 .then(function (response) {
-                    log("Depatuers for stop id: " + stopId + " retrived");
+                    debug("Depatuers for stop id: " + stopId + " retrived");
                     var responseJson;
                     var parseString = parser.parseString;
                     parseString(response, function (err, result) {
                         responseJson = result;
                     });
                     CurrentStop = self.getStop(responseJson.DepartureBoard)
-                    log("current stop: " + CurrentStop.name);
+                    debug("current stop: " + CurrentStop.name);
                     resolve(CurrentStop);
                     //self.addStop(self.getStop(responseJson.DepartureBoard));
                 })
@@ -224,7 +224,7 @@ module.exports = NodeHelper.create({
     socketNotificationReceived: function (notification, payload) {
         const self = this;
         log("socketNotificationReceived")
-        if (notification === 'CONFIG' /*&& this.started == false*/) {
+        if (notification === "CONFIG" /*&& this.started == false*/) {
             log("CONFIG event received")
             this.config = payload;
             this.started = true;
@@ -253,7 +253,7 @@ function diffInMin(date1, date2) {
 
 // --------------------------------------- Create a date object with the time in timeStr (hh:mm)
 function dateObj(timeStr) {
-    var parts = timeStr.split(':');
+    var parts = timeStr.split(":");
     var date = new Date();
     date.setHours(+parts.shift());
     date.setMinutes(+parts.shift());

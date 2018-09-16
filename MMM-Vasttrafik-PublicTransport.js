@@ -9,7 +9,7 @@
  * Magic Mirror By Michael Teeuw http://michaelteeuw.nl
  * MIT Licensed.
  * 
- * Module MMM-Vasttrafik-PublicTransport By Bure R�man Vinn�
+ * Module MMM-Vasttrafik-PublicTransport By Bure Råman Vinnå
  * 
  */
 
@@ -17,17 +17,25 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
 
     // Default module config.
     defaults: {
-        stopIds: ["9021014007270000", "9021014004310000"],
+        stopIds: ["9021014001950000"], //Centralstationen, Göteborg
         appKey: "",
         appSecret: "",
         debug: false,
-        sortBy: "track"
+        sortBy: "track",
+        refreshRate: "60000"
     },
 
     getScripts: function () {
         return [
             "moment.js"
         ];
+    },
+
+    getTranslations: function () {
+        return {
+            en: "translations/en.json",
+            se: "translations/se.json"
+        }
     },
 
     getStyles: function () {
@@ -48,12 +56,6 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
 
     getDom: function () {
         Log.info("getDom triggered");
-        var header_titles = {
-            line: "Linje",
-            next: "Nästa",
-            upcoming: "Därefter",
-            track: "Läge"
-        }
         var wrapper = document.createElement("div");
         if (!this.loaded && !this.failure) {
             wrapper.innerHTML = "<img src='http://seekvectorlogo.com/wp-content/uploads/2018/07/vasttrafik-ab-vector-logo-small.png'></img>"
@@ -75,7 +77,7 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
                 table.className = "small departure-board";
                 var row = document.createElement("tr");
                 var th = document.createElement("th");
-                th.innerHTML = header_titles.line;
+                th.innerHTML = this.translate("LINE");
                 th.className = 'align-left';
                 row.appendChild(th);
                 th = document.createElement("th");
@@ -83,21 +85,21 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
                 th.className = 'align-left';
                 row.appendChild(th);
                 th = document.createElement("th");
-                th.innerText = header_titles.next;
+                th.innerText = this.translate("NEXT");
                 row.appendChild(th);
                 row.appendChild(th);
                 th = document.createElement("th");
-                th.innerHTML = header_titles.upcoming;
+                th.innerHTML = this.translate("UPCOMING");
                 row.appendChild(th);
                 table.appendChild(row);
                 th = document.createElement("th");
-                th.innerHTML = header_titles.track;
+                th.innerHTML = this.translate("TRACK");
                 th.className = 'align-left';
                 row.appendChild(th);
                 for (var n = 0; n < stop.lines.length; n++) {
                     var line = stop.lines[n];
                     var row = document.createElement("tr");
-                    row.style="min-widtgh:50px"
+                    row.style = "min-widtgh:50px"
                     var td = document.createElement("td");
                     var div = document.createElement("div");
                     div.className = "departure-designation";
@@ -158,13 +160,13 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
 
 function getDisplayTime(min) {
     if (min == undefined) {
-        return "-"
+        return this.translate("UNDEFINED");
     }
     else if (min == 0) {
-        return "Nu";
+        return this.translate("NOW");
     }
     else {
         return min;
     }
-    
+
 }
