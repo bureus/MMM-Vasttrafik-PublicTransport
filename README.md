@@ -50,21 +50,23 @@ modules: [
             position: 'bottom_left',
             header: "Västtrafik",
             config: {
-                stopIds: ["your_stop_ids"],		// REQUIRED. An array of stop is's. Your are required to have at least one stop. 
-												// see 3. Get stops that you want to track.
-                appKey: "your_app_key",			// REQUIRED. see 1. Create application and obtain required client id and secret.
-                appSecret: "your_app_secret",	// REQUIRED. see 1. Create application and obtain required client id and secret.
-                debug: false,					// Optional. Enable some extra output when debugging.
-                sortBy: "track"					// Optional. Sort your departure board by either "track", "direction", "line" or "type"
-												// default is "track".
-				refreshRate: "20000"			// Optional. Refresh rate int milliseconds, default is 60 seconds, 
+                     stopIds: ["your_stop_ids"],   // REQUIRED. An array of stop is's. Your are required to have at least one stop.
+                                                   // see 3. Get stops that you want to track.
+                     appKey: "your_app_key",       // REQUIRED. see 1. Create application and obtain required client id and secret.
+                     appSecret: "your_app_secret", // REQUIRED. see 1. Create application and obtain required client id and secret.
+                     debug: false,                 // Optional. Enable some extra output when debugging.
+                     sortBy: "track"               // Optional. Sort your departure board by either "track", "direction", "line" or "type"
+                                                   // default is "track".
+                     refreshRate: "20000"          // Optional. Refresh rate int milliseconds, default is 60 seconds, 
             }
         },
     ...
 ]
 ```
+## Supports multi stops and translations
 
+![Example of swedish translation and tracking two stops](https://github.com/bureus/MMM-Vasttrafik-PublicTransport/blob/master/docs/swedishAndMultistops)
 ## Screenshot
 
-![SL PublicTransport Module](https://github.com/boghammar/MMM-SL-PublicTransport/blob/master/docs/MMMScreenshot2.PNG)
+![Västtrafik PublicTransport Module](https://github.com/bureus/MMM-Vasttrafik-PublicTransport/blob/master/docs/screenshot.PNG)
 

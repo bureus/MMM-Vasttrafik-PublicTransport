@@ -34,7 +34,7 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
     getTranslations: function () {
         return {
             en: "translations/en.json",
-            se: "translations/se.json"
+            sv: "translations/sv.json"
         }
     },
 
@@ -114,11 +114,11 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
                     td.innerHTML = line.direction;
                     row.appendChild(td);
                     var td = document.createElement("td");
-                    td.innerHTML = getDisplayTime(line.departureIn);
+                    td.innerHTML = this.getDisplayTime(line.departureIn);
                     td.style = "text-align: center;"
                     row.appendChild(td);
                     var td = document.createElement("td");
-                    td.innerHTML = getDisplayTime(line.nextDeparture);
+                    td.innerHTML = this.getDisplayTime(line.nextDeparture);
                     td.style = "text-align: center;"
                     row.appendChild(td);
                     var td = document.createElement("td");
@@ -151,22 +151,19 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
                 this.updateDom();
             }
         }
+    },
+
+    // --------------------------------------- Get depature display time
+    getDisplayTime: function (min) {
+        if (min == undefined) {
+            return this.translate("UNDEFINED");
+        }
+        else if (min == 0) {
+            return this.translate("NOW");
+        }
+        else {
+            return min;
+        }
+
     }
 });
-
-//
-// Utilities
-//
-
-function getDisplayTime(min) {
-    if (min == undefined) {
-        return this.translate("UNDEFINED");
-    }
-    else if (min == 0) {
-        return this.translate("NOW");
-    }
-    else {
-        return min;
-    }
-
-}
