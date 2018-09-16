@@ -64,8 +64,9 @@ modules: [
 ]
 ```
 ## Supports multi stops and translations
-You can add a list of stop ids if you want to track multiple stops. Current supported languages are Swedish (sv) and English (en) and read from MagicMirror configurations.  
-![Example of swedish translation and tracking two stops](https://github.com/bureus/MMM-Vasttrafik-PublicTransport/blob/master/docs/swedishAndMultistops)
+You can add a list of stop ids if you want to track multiple stops. Current supported languages are Swedish (sv) and English (en) and set in MagicMirror configurations.
+
+![Example of swedish translation and tracking two stops](https://github.com/bureus/MMM-Vasttrafik-PublicTransport/blob/master/docs/swedishAndMultistops.PNG)
 ## Screenshot
 
 ![Västtrafik PublicTransport Module](https://github.com/bureus/MMM-Vasttrafik-PublicTransport/blob/master/docs/screenshot.PNG)
