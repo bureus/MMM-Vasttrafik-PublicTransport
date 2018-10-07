@@ -24,6 +24,7 @@
     "nodejs-base64-encode": "0.0.2",
     "request-promise": "^4.2.2",
     "url": "^0.11.0",
-    "xml2js": "^0.4.19"
+    "xml2js": "^0.4.19",
+    "request": "^2.81.0"
   }
 }
