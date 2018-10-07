@@ -1,0 +1,29 @@
+{
+  "name": "MMM-Vasttrafik-PublicTransport",
+  "version": "1.0.0",
+  "description": "[Magic Mirror](https://magicmirror.builders/) Module - Display public transport operated by Västtrafik for western part of Sweden, including Gothenburg. This module use the API's provided by [Västtrafik](https://www.vasttrafik.se).",
+  "main": "MMM-Vasttrafik-PublicTransport.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bureus/MMM-Vasttrafik-PublicTransport.git"
+  },
+  "keywords": [],
+  "author": "bureus",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bureus/MMM-Vasttrafik-PublicTransport/issues"
+  },
+  "homepage": "https://github.com/bureus/MMM-Vasttrafik-PublicTransport#readme",
+  "dependencies": {
+    "nodejs-base64-encode": "0.0.2",
+    "request-promise": "^4.2.2",
+    "url": "^0.11.0",
+    "xml2js": "^0.4.19"
+  }
+}
