@@ -8,6 +8,12 @@
     min-width: 40px !important;
 }
 
+.departure-board .destination-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+}
+
 .departure-board td {
     min-width: 70px;
 }

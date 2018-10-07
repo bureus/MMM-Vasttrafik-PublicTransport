@@ -112,6 +112,7 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
                     row.appendChild(td);
                     var td = document.createElement("td");
                     td.innerHTML = line.direction;
+                    td.className = "destination-name";
                     row.appendChild(td);
                     var td = document.createElement("td");
                     td.innerHTML = this.getDisplayTime(line.departureIn);

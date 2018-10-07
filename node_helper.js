@@ -30,60 +30,63 @@ module.exports = NodeHelper.create({
 
     // --------------------------------------- Schedule a departure update
     scheduleUpdate: function () {
-        var self = this;
+        let self = this;
         this.updatetimer = setInterval(function () { // This timer is saved in uitimer so that we can cancel it
             self.getStops();
         }, this.config.refreshRate);
     },
 
     // --------------------------------------- Get access token
-    getAccessToken: function () {
-        var self = this;
-        var basicAuth = encode.encode(this.config.appKey + ":" + this.config.appSecret, "base64")
-        var options = {
-            method: "POST",
-            uri: "https://api.vasttrafik.se/token",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-                "Authorization": "Basic " + basicAuth,
-            },
-            body: "grant_type=client_credentials&scope=456"
-        };
+    getAccessToken: async function () {
+        let self = this;
+        return new Promise(resolve => {
+            let basicAuth = encode.encode(this.config.appKey + ":" + this.config.appSecret, "base64")
+            let options = {
+                method: "POST",
+                uri: "https://api.vasttrafik.se/token",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "Authorization": "Basic " + basicAuth,
+                },
+                body: "grant_type=client_credentials&scope=456"
+            };
 
-        request(options)
-            .then(function (body) {
-                var reply = JSON.parse(body);
-                self.accessToken = {
-                    token: reply.access_token,
-                    expires: reply.expires_in
-                }
-                debug("generateAccessToken completed");
-            })
-            .catch(function (error) {
-                log("generateAccessToken failed =" + error);
-                self.sendSocketNotification("SERVICE_FAILURE", error);
-            });
+            request(options)
+                .then(function (body) {
+                    let reply = JSON.parse(body);
+                    self.accessToken = {
+                        token: reply.access_token,
+                        expires: reply.expires_in
+                    }
+                    debug("generateAccessToken completed");
+                    resolve(true);
+                })
+                .catch(function (error) {
+                    log("generateAccessToken failed =" + error);
+                    self.sendSocketNotification("SERVICE_FAILURE", error);
+                    reject();
+                });
+        });
 
 
     },
-    getStops: function () {
-        var self = this;
+    getStops: async function () {
+        let self = this;
 
         if (!self.accessToken) {
-            self.getAccessToken(); // Get inital access token
+            await self.getAccessToken(); // Get inital access token
         }
 
         clearInterval(this.updatetimer); // Clear the timer so that we can set it again
 
         debug("stationid is array=" + Array.isArray(this.config.stopIds));
-        var Proms = [];
+        let Proms = [];
         // Loop over all stations
         this.config.stopIds.forEach(stopId => {
-            var P = new Promise((resolve, reject) => {
+            let P = new Promise((resolve, reject) => {
                 self.getDeparture(stopId, resolve, reject);
             });
             debug("Pushing promise for stop " + stopId);
-            console.log(P);
             Proms.push(P);
         });
 
@@ -99,20 +102,19 @@ module.exports = NodeHelper.create({
     },
 
     addStop: function (stop) {
-        var self = this;
+        let self = this;
         debug("adding stop to stops: " + stop.name);
         self.stops.push(stop);
     },
 
     getDeparture: function (stopId, resolve, reject) {
-        var self = this;
-        var CurrentStop = {};
+        let self = this;
+        let currentStop = {};
         debug("Getting departures for stop id: " + stopId);
-        var now = new Date(Date.now());
-        //https://api.vasttrafik.se/bin/rest.exe/v2/departureBoard?id={stopId}&date={date}&time={time}
+        let now = new Date(Date.now());
         if (self.accessToken) {
             debug("Access token retrived: Calling depatureBoard");
-            var options = {
+            let options = {
                 method: "GET",
                 uri: "https://api.vasttrafik.se/bin/rest.exe/v2/departureBoard",
                 headers: {
@@ -129,15 +131,14 @@ module.exports = NodeHelper.create({
             request(options)
                 .then(function (response) {
                     debug("Depatuers for stop id: " + stopId + " retrived");
-                    var responseJson;
-                    var parseString = parser.parseString;
+                    let responseJson;
+                    let parseString = parser.parseString;
                     parseString(response, function (err, result) {
                         responseJson = result;
                     });
-                    CurrentStop = self.getStop(responseJson.DepartureBoard)
-                    debug("current stop: " + CurrentStop.name);
-                    resolve(CurrentStop);
-                    //self.addStop(self.getStop(responseJson.DepartureBoard));
+                    currentStop = self.getStop(responseJson.DepartureBoard)
+                    debug("current stop: " + currentStop.name);
+                    resolve(currentStop);
                 })
                 .catch(function (error) {
                     log("getDeparture failed =" + error);
@@ -151,18 +152,18 @@ module.exports = NodeHelper.create({
     },
 
     getStop: function (depatureBoard) {
-        var self = this;
-        var stop = {
+        let self = this;
+        let stop = {
             name: depatureBoard.Departure[0].$.stop,
             time: depatureBoard.$.servertime,
             lines: [],
             now: new Date(Date.now())
         };
 
-        for (var i = 0; i < depatureBoard.Departure.length; i++) {
-            var dep = depatureBoard.Departure[i].$;
+        for (let i = 0; i < depatureBoard.Departure.length; i++) {
+            let dep = depatureBoard.Departure[i].$;
             if (stop.lines.length === 0) {
-                var line = {
+                let line = {
                     direction: dep.direction,
                     line: dep.sname,
                     departureIn: diffInMin(dateObj(dep.rtTime ? dep.rtTime : dep.time), stop.now),
@@ -178,13 +179,13 @@ module.exports = NodeHelper.create({
                 function findIndex(element) {
                     return element.track == dep.track && element.line == dep.sname;
                 }
-                var index = stop.lines.findIndex(findIndex);
+                let index = stop.lines.findIndex(findIndex);
                 if (index > -1) {
-                    var line = stop.lines[index];
+                    let line = stop.lines[index];
                     line.depatuers.push(dep);
-                    var depIn = diffInMin(dateObj(dep.rtTime ? dep.rtTime : dep.time), stop.now)
+                    let depIn = diffInMin(dateObj(dep.rtTime ? dep.rtTime : dep.time), stop.now)
                     if (line.departureIn > depIn) {
-                        var depInOld = line.departureIn;
+                        let depInOld = line.departureIn;
                         line.departureIn = depIn;
                         if (!line.nextDeparture) {
                             line.nextDeparture = depInOld;
@@ -202,7 +203,7 @@ module.exports = NodeHelper.create({
                     stop.lines[index] = line;
                 }
                 else {
-                    var line = {
+                    let line = {
                         direction: dep.direction,
                         line: dep.sname,
                         departureIn: diffInMin(dateObj(dep.rtTime ? dep.rtTime : dep.time), stop.now),
@@ -241,20 +242,20 @@ module.exports = NodeHelper.create({
 //
 function sortByKey(array, key) {
     return array.sort(function (a, b) {
-        var x = a[key]; var y = b[key];
+        let x = a[key]; let y = b[key];
         return ((x < y) ? -1 : ((x > y) ? 1 : 0));
     });
 }
 
 function diffInMin(date1, date2) {
-    var diff = Math.abs(date2 - date1);
+    let diff = Math.abs(date2 - date1);
     return Math.floor((diff / 1000) / 60);
 }
 
 // --------------------------------------- Create a date object with the time in timeStr (hh:mm)
 function dateObj(timeStr) {
-    var parts = timeStr.split(":");
-    var date = new Date();
+    let parts = timeStr.split(":");
+    let date = new Date();
     date.setHours(+parts.shift());
     date.setMinutes(+parts.shift());
     return date;
