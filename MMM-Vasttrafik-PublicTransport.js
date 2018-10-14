@@ -22,7 +22,13 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
         appSecret: "",
         debug: false,
         sortBy: "track",
-        refreshRate: "60000"
+        refreshRate: "60000",
+        trafficSituations: false,
+        board: {
+            destination: {
+                maxPxWidth: null
+            }
+        }
     },
 
     getScripts: function () {
@@ -46,17 +52,17 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
 
     start: function () {
         Log.info("Starting module: " + this.name);
-        this.updateDom();
+        this.renderBoard();
 
         //Send config to node_helper
         Log.info("Send configs to node_helper..");
         this.sendSocketNotification("CONFIG", this.config);
-        var self = this;
     },
 
     getDom: function () {
         Log.info("getDom triggered");
-        var wrapper = document.createElement("div");
+        let wrapper = document.createElement("div");
+        wrapper.className = "departure-board";
         if (!this.loaded && !this.failure) {
             wrapper.innerHTML = "<img src='http://seekvectorlogo.com/wp-content/uploads/2018/07/vasttrafik-ab-vector-logo-small.png'></img>"
             return wrapper;
@@ -67,70 +73,143 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
             return wrapper;
         }
         if (this.stops) {
-            for (var i = 0; i < this.stops.length; i++) {
-                var stop = this.stops[i];
-                var header = document.createElement("div");
+            for (let i = 0; i < this.stops.length; i++) {
+                let stop = this.stops[i];
+                let header = document.createElement("div");
                 header.innerHTML = " <b>" + stop.name + "</b>";
                 header.className = "light small";
                 wrapper.appendChild(header);
-                var table = document.createElement("table");
-                table.className = "small departure-board";
-                var row = document.createElement("tr");
-                var th = document.createElement("th");
-                th.innerHTML = this.translate("LINE");
-                th.className = 'align-left';
-                row.appendChild(th);
-                th = document.createElement("th");
-                th.innerHTML = ""
-                th.className = 'align-left';
-                row.appendChild(th);
-                th = document.createElement("th");
-                th.innerText = this.translate("NEXT");
-                row.appendChild(th);
-                row.appendChild(th);
-                th = document.createElement("th");
-                th.innerHTML = this.translate("UPCOMING");
-                row.appendChild(th);
-                table.appendChild(row);
-                th = document.createElement("th");
-                th.innerHTML = this.translate("TRACK");
-                th.className = 'align-left';
-                row.appendChild(th);
-                for (var n = 0; n < stop.lines.length; n++) {
-                    var line = stop.lines[n];
-                    var row = document.createElement("tr");
-                    row.style = "min-widtgh:50px"
-                    var td = document.createElement("td");
-                    var div = document.createElement("div");
-                    div.className = "departure-designation";
-                    div.style = "background-color:" + line.bgColor;
-                    var span = document.createElement("span");
-                    span.style = "color:" + line.color;
-                    span.textContent = line.line;
-                    div.appendChild(span);
-                    td.appendChild(div);
-                    row.appendChild(td);
-                    var td = document.createElement("td");
-                    td.innerHTML = line.direction;
-                    td.className = "destination-name";
-                    row.appendChild(td);
-                    var td = document.createElement("td");
-                    td.innerHTML = this.getDisplayTime(line.departureIn);
-                    td.style = "text-align: center;"
-                    row.appendChild(td);
-                    var td = document.createElement("td");
-                    td.innerHTML = this.getDisplayTime(line.nextDeparture);
-                    td.style = "text-align: center;"
-                    row.appendChild(td);
-                    var td = document.createElement("td");
-                    td.style = "text-align: center;"
-                    td.innerHTML = line.track;
-                    row.appendChild(td);
-                    table.appendChild(row);
-                };
-                wrapper.appendChild(table);
+                //Situations
+                if (this.config.trafficSituations) {
+                    let trafficSituationContainer = document.createElement("div");
+                    trafficSituationContainer.id = "departure-traffic-situation-container-" + stop.stopId;
+                    if (this.config.trafficSituations && this.trafficSituationsLoaded) {
+                        let situtation = this.trafficSituations.find(obj => {
+                            return obj.stopId === stop.stopId;
+                        });
+                        if (situtation && situtation.trafficSituations) {
+                            trafficSituationContainer.innerHTML = this.generateTrafficSituations(situtation.trafficSituations);
+                        }
+                    }
+                    wrapper.appendChild(trafficSituationContainer);
+                }
+                let tableContainer = document.createElement("div");
+                tableContainer.id = "departure-table-container-" + stop.stopId;
+                tableContainer.innerHTML = this.generateDepartureTable(stop);
+                wrapper.appendChild(tableContainer);
+
             }
+            this.depratureTablesLoaded = true;
             return wrapper;
+        }
+    },
+
+    generateTrafficSituations: function (trafficSituations) {
+        let trafficSituation = document.createElement("div");
+        let text = "";
+        for (let i = 0; i < trafficSituations.length; i++) {
+            text += trafficSituations[i].title + trafficSituations[i].description;
+        }
+        trafficSituation.innerHTML = '<marquee behavior="scroll" direction="left" class="small">' + text + '</marquee>';
+        return trafficSituation.outerHTML;
+    },
+    generateDepartureTable: function (stop) {
+        let table = document.createElement("table");
+        table.className = "small departure-table";
+        let row = document.createElement("tr");
+        let th = document.createElement("th");
+        th = document.createElement("th");
+        th.innerHTML = this.translate("LINE");
+        th.className = 'align-left';
+        row.appendChild(th);
+        th = document.createElement("th");
+        th.innerHTML = ""
+        th.className = 'align-left';
+        row.appendChild(th);
+        th = document.createElement("th");
+        th.innerText = this.translate("NEXT");
+        row.appendChild(th);
+        row.appendChild(th);
+        th = document.createElement("th");
+        th.innerHTML = this.translate("UPCOMING");
+        row.appendChild(th);
+        table.appendChild(row);
+        th = document.createElement("th");
+        th.innerHTML = this.translate("TRACK");
+        th.className = 'align-left';
+        row.appendChild(th);
+        for (let n = 0; n < stop.lines.length; n++) {
+            let line = stop.lines[n];
+            let row = document.createElement("tr");
+            let td = document.createElement("td");
+            td = document.createElement("td");
+            let div = document.createElement("div");
+            div.className = "departure-designation";
+            div.style = "background-color:" + line.bgColor;
+            let span = document.createElement("span");
+            span.style = "color:" + line.color;
+            span.textContent = line.line;
+            div.appendChild(span);
+            td.appendChild(div);
+            row.appendChild(td);
+            td = document.createElement("td");
+            div = document.createElement("div");
+            div.innerText = line.direction;
+            if (this.config.board.destination.maxPxWidth) {
+                div.style = 'max-width:'+this.config.board.destination.maxPxWidth + 'px !important';
+            }
+            div.className = "destination-name";
+            td.appendChild(div);
+            row.appendChild(td);
+            td = document.createElement("td");
+            td.innerHTML = this.getDisplayTime(line.departureIn);
+            td.style = "text-align: center;"
+            row.appendChild(td);
+            td = document.createElement("td");
+            td.innerHTML = this.getDisplayTime(line.nextDeparture);
+            td.style = "text-align: center;"
+            row.appendChild(td);
+            td = document.createElement("td");
+            td.style = "text-align: center;"
+            td.innerHTML = line.track;
+            row.appendChild(td);
+            table.appendChild(row);
+        };
+
+        return table.outerHTML;
+
+    },
+
+    renderBoard: function () {
+        if (this.domObjectCreated && this.loaded && this.trafficSituationsLoaded && this.depratureTablesLoaded) {
+            this.stops.forEach(stop => {
+                let tableContainer = document.getElementById("departure-table-container-" + stop.stopId);
+                if (tableContainer) {
+                    tableContainer.innerHTML = this.generateDepartureTable(stop);
+                }
+            });
+        } else {
+            this.updateDom();
+        }
+    },
+
+    renderTrafficSituations: function () {
+        if (this.domObjectCreated && this.loaded && this.trafficSituationsLoaded && this.depratureTablesLoaded && this.config.trafficSituation) {
+            this.stops.forEach(stop => {
+                let situationContainer = document.getElementById("departure-traffic-situation-container-" + stop.stopId);
+                if (situationContainer) {
+                    if (this.config.trafficSituations && this.trafficSituationsLoaded) {
+                        let situtation = this.trafficSituations.find(obj => {
+                            return obj.stopId === stop.stopId;
+                        });
+                        if (situtation && situtation.trafficSituations) {
+                            situationContainer.innerHTML = this.generateTrafficSituations(situtation.trafficSituations);
+                        }
+                    }
+                }
+            });
+        } else {
+            this.updateDom();
         }
     },
 
@@ -142,18 +221,28 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
             this.failure = undefined;
             // Handle payload
             this.stops = payload;
-            this.updateDom();
+            this.renderBoard();
+        }
+        else if (notification === "TRAFFICSITUATION") {
+            this.trafficSituationsLoaded = true;
+            // Handle payload
+            this.trafficSituations = payload;
+            this.renderTrafficSituations();
         }
         else if (notification == "SERVICE_FAILURE") {
             this.loaded = true;
             this.failure = payload;
             if (payload) {
                 Log.info("Service failure: " + this.failure.resp.StatusCode + ':' + this.failure.resp.Message);
-                this.updateDom();
+                this.renderBoard();
             }
         }
     },
-
+    notificationReceived: function (notification, payload, sender) {
+        if (notification == "DOM_OBJECTS_CREATED") {
+            this.domObjectCreated = true;
+        }
+    },
     // --------------------------------------- Get depature display time
     getDisplayTime: function (min) {
         if (min == undefined) {

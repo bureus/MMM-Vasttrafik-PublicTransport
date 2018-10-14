@@ -1,7 +1,7 @@
 /* MMM-Vasttrafik-PublicTransport.js - DRAFT
  *
- * Magic Mirror module - Display public transport depature board for Västtrafik/Sweden. 
- * This module use the API"s provided by Västtrafik (https://developer.vasttrafik.se).
+ * Magic Mirror module - Display public transport depature board for Vï¿½sttrafik/Sweden. 
+ * This module use the API"s provided by Vï¿½sttrafik (https://developer.vasttrafik.se).
  * 
  * Magic Mirror
  * Module: MMM-Vasttrafik-PublicTransport
@@ -9,7 +9,7 @@
  * Magic Mirror By Michael Teeuw http://michaelteeuw.nl
  * MIT Licensed.
  * 
- * Module MMM-Vasttrafik-PublicTransport By Bure Råman Vinnå
+ * Module MMM-Vasttrafik-PublicTransport By Bure Rï¿½man Vinnï¿½
  * 
  */
 const NodeHelper = require("node_helper");
@@ -34,6 +34,13 @@ module.exports = NodeHelper.create({
         this.updatetimer = setInterval(function () { // This timer is saved in uitimer so that we can cancel it
             self.getStops();
         }, this.config.refreshRate);
+    },
+    // --------------------------------------- Schedule traffic situations update
+    scheduleUpdateTrafficSituations: function () {
+        let self = this;
+        this.updateTimerTrafficSituations = setInterval(function () { // This timer is saved in uitimer so that we can cancel it
+            self.getTrafficSituations();
+        }, 3600000); //update traffic situations every hour
     },
 
     // --------------------------------------- Get access token
@@ -73,9 +80,9 @@ module.exports = NodeHelper.create({
     getStops: async function () {
         let self = this;
 
-        if (!self.accessToken) {
+        /*if (!self.accessToken) {
             await self.getAccessToken(); // Get inital access token
-        }
+        }*/
 
         clearInterval(this.updatetimer); // Clear the timer so that we can set it again
 
@@ -100,6 +107,8 @@ module.exports = NodeHelper.create({
 
         self.scheduleUpdate(); // reinitiate the timer
     },
+
+
 
     addStop: function (stop) {
         let self = this;
@@ -136,7 +145,7 @@ module.exports = NodeHelper.create({
                     parseString(response, function (err, result) {
                         responseJson = result;
                     });
-                    currentStop = self.getStop(responseJson.DepartureBoard)
+                    currentStop = self.getStop(stopId, responseJson.DepartureBoard)
                     debug("current stop: " + currentStop.name);
                     resolve(currentStop);
                 })
@@ -151,9 +160,10 @@ module.exports = NodeHelper.create({
         }
     },
 
-    getStop: function (depatureBoard) {
+    getStop: function (stopId, depatureBoard) {
         let self = this;
         let stop = {
+            stopId: stopId,
             name: depatureBoard.Departure[0].$.stop,
             time: depatureBoard.$.servertime,
             lines: [],
@@ -221,8 +231,94 @@ module.exports = NodeHelper.create({
         stop.lines = sortByKey(stop.lines, self.config.sortBy);
         return stop;
     },
-    // --------------------------------------- Handle notifocations
-    socketNotificationReceived: function (notification, payload) {
+
+    getTrafficSituation: function (stopId, resolve, reject) {
+        let self = this;
+        let trafficSituations = {};
+        debug("Getting traffic situation for stop id: " + stopId);
+        if (self.accessToken) {
+            debug("Access token retrived: Calling traffic situation");
+            let options = {
+                method: "GET",
+                uri: "https://api.vasttrafik.se/ts/v1/traffic-situations/stoppoint/" + stopId,
+                headers: {
+                    "Authorization": "Bearer " + self.accessToken.token,
+                },
+                json: true
+            };
+
+            request(options)
+                .then(function (response) {
+                    debug("Traffic situation for stop id: " + stopId + " retrived");
+                    let trafficSituations = self.getTrafficSituationDto(stopId, response);
+
+                    debug(trafficSituations ? "Traffic situations found for " + stopId : "No traffic situations for" + stopId);
+                    debug("Traffic situations response: " + JSON.stringify(response));
+                    resolve({
+                        stopId: stopId,
+                        trafficSituations: trafficSituations
+                    });
+                })
+                .catch(function (error) {
+                    log("getTrafficSituation failed =" + error);
+                    if (error.statusCode == 401)
+                        self.getAccessToken();
+                });
+        } else {
+            log("Missing access token..");
+            reject();
+        }
+    },
+
+    getTrafficSituationDto: function (stopId, trafficSituationsDto) {
+        if (trafficSituationsDto && Array.isArray(trafficSituationsDto) && trafficSituationsDto.length > 0) {
+            let trafficSituations = [];
+            for (let i = 0; i < trafficSituationsDto.length; i++) {
+                let trafficSituation = {
+                    stopId: stopId,
+                    title: trafficSituationsDto[i].title,
+                    description: trafficSituationsDto[i].description,
+                    severity: trafficSituationsDto[i].severity,
+                    endTime: trafficSituationsDto[i].endTime,
+                    startTime: trafficSituationsDto[i].startTime,
+                    active: isDateBetween(trafficSituationsDto[i].startTime, trafficSituationsDto[i].endTime, new Date(Date.now()))
+                }
+                trafficSituations.push(trafficSituation);
+            }
+            return sortByKey(trafficSituations, "active");
+        }
+        return null;
+    },
+
+    getTrafficSituations: function () {
+        let self = this;
+
+        clearInterval(this.updateTimerTrafficSituations); // Clear the timer so that we can set it again
+
+        debug("stationid is array=" + Array.isArray(this.config.stopIds));
+        let Proms = [];
+        // Loop over all stations
+        this.config.stopIds.forEach(stopId => {
+            let P = new Promise((resolve, reject) => {
+                self.getTrafficSituation(stopId, resolve, reject);
+            });
+            debug("Pushing promise for traffic situations for " + stopId);
+            Proms.push(P);
+        });
+
+        Promise.all(Proms).then(TrafficSituationArray => {
+            debug("all promises resolved " + TrafficSituationArray);
+            self.sendSocketNotification("TRAFFICSITUATION", TrafficSituationArray); // Send traffic situations to module
+        }).catch(reason => {
+            log("One or more promises rejected " + reason);
+            self.sendSocketNotification("SERVICE_FAILURE", reason);
+        });
+
+        self.scheduleUpdateTrafficSituations(); // reinitiate the timer
+    },
+
+    // --------------------------------------- Handle notifications
+    socketNotificationReceived: async function (notification, payload) {
         const self = this;
         log("socketNotificationReceived")
         if (notification === "CONFIG" /*&& this.started == false*/) {
@@ -230,9 +326,21 @@ module.exports = NodeHelper.create({
             this.config = payload;
             this.started = true;
             debugMe = this.config.debug;
+            if (!self.accessToken) {
+                await self.getAccessToken(); // Get inital access token
+            }
             self.getStops(); // Get it first time
-            if (!self.updatetimer)
+            if (!self.updatetimer) {
                 self.scheduleUpdate();
+            }
+
+            if (this.config.trafficSituations) {
+                self.getTrafficSituations(); // Get traffic situations first time
+            }
+
+            if (!self.updateTimerTrafficSituations && this.config.trafficSituations) {
+                self.scheduleUpdateTrafficSituations();
+            }
         };
     }
 });
@@ -250,6 +358,10 @@ function sortByKey(array, key) {
 function diffInMin(date1, date2) {
     let diff = Math.abs(date2 - date1);
     return Math.floor((diff / 1000) / 60);
+}
+
+function isDateBetween(fromDate, toDate, dateToCheck) {
+    return dateToCheck > fromDate && dateToCheck < toDate;
 }
 
 // --------------------------------------- Create a date object with the time in timeStr (hh:mm)
