@@ -69,13 +69,19 @@ modules: [
                      board: {
                         destination: {
                             maxPxWidth: 150       // Optional. Force max width for destination names.
-                        }
-                    }, 
+                        }, 
+                    },
+                    showTrackNumbers: false,     //Optional. Default is true, if set to false will hide track column.
+                    showStopHeader: false        //Optional. Default is true, if set to false will hide direction/stop column.   
             }
         },
     ...
 ]
 ```
+### Minimal layout
+If you are after minimal width, you should set showTrackNumbers and showStopHeader to false. This will render the board like this:
+![Example of minimal board](https://github.com/bureus/MMM-Vasttrafik-PublicTransport/blob/master/docs/extendedConfigs.PNG)
+
 ## Supports multi stops and translations
 You can add a list of stop ids if you want to track multiple stops. Current supported languages are Swedish (sv) and English (en) and set in MagicMirror configurations.
 

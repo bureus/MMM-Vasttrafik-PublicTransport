@@ -28,7 +28,9 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
             destination: {
                 maxPxWidth: null
             }
-        }
+        },
+        showTrackNumbers: true,
+        showStopHeader: true
     },
 
     getScripts: function () {
@@ -122,10 +124,12 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
         th.innerHTML = this.translate("LINE");
         th.className = 'align-left';
         row.appendChild(th);
-        th = document.createElement("th");
-        th.innerHTML = ""
-        th.className = 'align-left';
-        row.appendChild(th);
+        if(this.config.showStopHeader){
+            th = document.createElement("th");
+            th.innerHTML = ""
+            th.className = 'align-left';
+            row.appendChild(th);
+        }
         th = document.createElement("th");
         th.innerText = this.translate("NEXT");
         row.appendChild(th);
@@ -133,11 +137,13 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
         th = document.createElement("th");
         th.innerHTML = this.translate("UPCOMING");
         row.appendChild(th);
+        if(this.config.showTrackNumbers){
+            th = document.createElement("th");
+            th.innerHTML = this.translate("TRACK");
+            th.className = 'align-left';
+            row.appendChild(th);
+        }
         table.appendChild(row);
-        th = document.createElement("th");
-        th.innerHTML = this.translate("TRACK");
-        th.className = 'align-left';
-        row.appendChild(th);
         for (let n = 0; n < stop.lines.length; n++) {
             let line = stop.lines[n];
             let row = document.createElement("tr");
@@ -152,15 +158,17 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
             div.appendChild(span);
             td.appendChild(div);
             row.appendChild(td);
-            td = document.createElement("td");
-            div = document.createElement("div");
-            div.innerText = line.direction;
-            if (this.config.board.destination.maxPxWidth) {
-                div.style = 'max-width:'+this.config.board.destination.maxPxWidth + 'px !important';
+            if(this.config.showStopHeader){
+                td = document.createElement("td");
+                div = document.createElement("div");
+                div.innerText = line.direction;
+                if (this.config.board.destination.maxPxWidth) {
+                    div.style = 'max-width:'+this.config.board.destination.maxPxWidth + 'px !important';
+                }
+                div.className = "destination-name";
+                td.appendChild(div);
+                row.appendChild(td);
             }
-            div.className = "destination-name";
-            td.appendChild(div);
-            row.appendChild(td);
             td = document.createElement("td");
             td.innerHTML = this.getDisplayTime(line.departureIn);
             td.style = "text-align: center;"
@@ -169,10 +177,12 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
             td.innerHTML = this.getDisplayTime(line.nextDeparture);
             td.style = "text-align: center;"
             row.appendChild(td);
-            td = document.createElement("td");
-            td.style = "text-align: center;"
-            td.innerHTML = line.track;
-            row.appendChild(td);
+            if(this.config.showTrackNumbers){
+                td = document.createElement("td");
+                td.style = "text-align: center;"
+                td.innerHTML = line.track;
+                row.appendChild(td);
+            }
             table.appendChild(row);
         };
 
