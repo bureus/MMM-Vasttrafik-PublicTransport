@@ -27,9 +27,10 @@ Last thing todo is to find the required stop id:s that you would like to track.
 1. Navigate to the API consol for [Reseplaneraren v2](https://developer.vasttrafik.se/portal/#/api/Reseplaneraren/v2/landerss)
 2. Use any of the location endpoints to obatin the stop id. 
 
-Exampel request url:
+Exampel request url ([access token] could be retrived from the developer portal - API console directly, https://developer.vasttrafik.se/portal/#/api/Reseplaneraren/v2/landerss, or by  following this guide: https://developer.vasttrafik.se/portal/#/guides/oauth2):
 ```
-https://api.vasttrafik.se/bin/rest.exe/v2/location.name?input=centralstationen
+GET https://api.vasttrafik.se/bin/rest.exe/v2/location.name?input=centralstationen HTTP/1.1
+Authorization: Bearer [access_token]
 ```
 Response:
 ```
