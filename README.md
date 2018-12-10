@@ -71,15 +71,16 @@ modules: [
                             maxPxWidth: 150       // Optional. Force max width for destination names.
                         }, 
                     },
-                    showTrackNumbers: false,     //Optional. Default is true, if set to false will hide track column.
-                    showStopHeader: false        //Optional. Default is true, if set to false will hide direction/stop column.   
+                    showTrackNumbers: false,     //Optional. Default is true, if set to false will hide the track column.
+                    showStopHeader: false,       //Optional. Default is true, if set to false will hide the stop name header.
+                    showDestinationName: false   //Optional. Default is true, if set to false will hide the direction/stop column. 
             }
         },
     ...
 ]
 ```
 ### Minimal layout
-If you are after minimal width, you should set showTrackNumbers and showStopHeader to false. This will render the board like this:
+If you are after minimal width or design, you should set showTrackNumbers, showDestinationName and showStopHeader to false. This will render the board like this:
 
 ![Example of minimal board](https://github.com/bureus/MMM-Vasttrafik-PublicTransport/blob/master/docs/extendedConfigs.PNG)
 

@@ -30,7 +30,8 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
             }
         },
         showTrackNumbers: true,
-        showStopHeader: true
+        showStopHeader: true,
+        showDestinationName: true
     },
 
     getScripts: function () {
@@ -77,10 +78,12 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
         if (this.stops) {
             for (let i = 0; i < this.stops.length; i++) {
                 let stop = this.stops[i];
-                let header = document.createElement("div");
-                header.innerHTML = " <b>" + stop.name + "</b>";
-                header.className = "light small";
-                wrapper.appendChild(header);
+                if(this.config.showStopHeader){
+                    let header = document.createElement("div");
+                    header.innerHTML = " <b>" + stop.name + "</b>";
+                    header.className = "light small";
+                    wrapper.appendChild(header);
+                }
                 //Situations
                 if (this.config.trafficSituations) {
                     let trafficSituationContainer = document.createElement("div");
@@ -124,7 +127,7 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
         th.innerHTML = this.translate("LINE");
         th.className = 'align-left';
         row.appendChild(th);
-        if(this.config.showStopHeader){
+        if(this.config.showDestinationName){
             th = document.createElement("th");
             th.innerHTML = ""
             th.className = 'align-left';
@@ -158,7 +161,7 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
             div.appendChild(span);
             td.appendChild(div);
             row.appendChild(td);
-            if(this.config.showStopHeader){
+            if(this.config.showDestinationName){
                 td = document.createElement("td");
                 div = document.createElement("div");
                 div.innerText = line.direction;
