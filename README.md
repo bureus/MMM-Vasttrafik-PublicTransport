@@ -54,8 +54,8 @@ Response:
 modules: [
     ...
     {
-            module: 'MMM-Vasttrafik-PublicTransport',
-            position: 'bottom_left',
+            module: "MMM-Vasttrafik-PublicTransport",
+            position: "bottom_left",
             header: "Västtrafik",
             config: {
                      stopIds: ["your_stop_ids"],   // REQUIRED. An array of stop is's. Your are required to have at least one stop.
@@ -63,9 +63,9 @@ modules: [
                      appKey: "your_app_key",       // REQUIRED. see 1. Create application and obtain required client id and secret.
                      appSecret: "your_app_secret", // REQUIRED. see 1. Create application and obtain required client id and secret.
                      debug: false,                 // Optional. Enable some extra output when debugging.
-                     sortBy: "track"               // Optional. Sort your departure board by either "track", "direction", "line" or "type"
+                     sortBy: "track",               // Optional. Sort your departure board by either "track", "direction", "line" or "type"
                                                    // default is "track".
-                     refreshRate: "20000"          // Optional. Refresh rate int milliseconds, default is 60 seconds.
+                     refreshRate: "20000",          // Optional. Refresh rate int milliseconds, default is 60 seconds.
                      trafficSituations: true,      // Optional. Default is false, you need a subscription to TrafficSituations v1 API please see Prerequisites 2.1
                      board: {
                         destination: {
