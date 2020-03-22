@@ -240,7 +240,7 @@ module.exports = NodeHelper.create({
             debug("Access token retrived: Calling traffic situation");
             let options = {
                 method: "GET",
-                uri: "https://api.vasttrafik.se/ts/v1/traffic-situations/stoppoint/" + stopId,
+                uri: "https://api.vasttrafik.se/ts/v1/traffic-situations/stoparea/" + stopId,
                 headers: {
                     "Authorization": "Bearer " + self.accessToken.token,
                 },
