@@ -75,11 +75,44 @@ modules: [
                     showTrackNumbers: false,     //Optional. Default is true, if set to false will hide the track column.
                     showStopHeader: false,       //Optional. Default is true, if set to false will hide the stop name header.
                     showDestinationName: false   //Optional. Default is true, if set to false will hide the direction/stop column. 
+                    filterAttr: "track",           //Optional. Default is null, if set 'filterKey' also needs to be set. Allowed value: "track", "direction", "line" or "type"
+                    filterKey: "A"             //Optional. Default is null, if set 'filterAttr' also needs to be set. Filter key is any value of the filtered attribute, see filtered board. 
             }
         },
     ...
 ]
 ```
+### Filtered board
+If you want to filter the departure board you could do that by setting configs for "filterAttr" and "filterKey". Both settings needs to be set if used. Default is null. You cant filter on multiple keys, so for example you cannot filter on track "A,B" but only on "B" or "A".  
+
+#### Example A - filter on Track:
+So in order to filter the board on Track A. You could do that by simply setting "filterAttr" to "track" and "filterKey" to "A". This will remove all other tracks from the board. The same goes for "direction", "line" or "type".
+
+```
+config: {
+                    .....
+                    filterAttr: "track",
+                    filterKey: "A"
+                    ....
+        }
+```
+
+![Example of filter on track](https://github.com/bureus/MMM-Vasttrafik-PublicTransport/blob/master/docs/filterOnTrack.PNG)
+
+#### Example B - filter on Line:
+So in order to filter the board on Track A. You could do that by simply setting "filterAttr" to "track" and "filterKey" to "A". This will remove all other tracks from the board. The same goes for "direction", "line" or "type".
+
+```
+config: {
+                    .....
+                    filterAttr: "line",
+                    filterKey: "4"
+                    ....
+        }
+```
+
+![Example of filter on track](https://github.com/bureus/MMM-Vasttrafik-PublicTransport/blob/master/docs/filterOnLine.PNG)
+
 ### Minimal layout
 If you are after minimal width or design, you should set showTrackNumbers, showDestinationName and showStopHeader to false. This will render the board like this:
 
@@ -98,4 +131,3 @@ You can get ongoing traffic situations or planned maintenance (swedish only) for
 ## Screenshot
 
 ![Västtrafik PublicTransport Module](https://github.com/bureus/MMM-Vasttrafik-PublicTransport/blob/master/docs/screenshot.PNG)
-
