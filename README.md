@@ -100,7 +100,7 @@ config: {
 ![Example of filter on track](https://github.com/bureus/MMM-Vasttrafik-PublicTransport/blob/master/docs/filterOnTrack.PNG)
 
 #### Example B - filter on Line:
-So in order to filter the board on Track A. You could do that by simply setting "filterAttr" to "track" and "filterKey" to "A". This will remove all other tracks from the board. The same goes for "direction", "line" or "type".
+So in order to filter the board on Line 4. Change config settings "filterAttr" to "line" and "filterKey" to "4". This will remove all other lines from the board.
 
 ```
 config: {
