@@ -77,6 +77,29 @@ modules: [
                     showDestinationName: false   //Optional. Default is true, if set to false will hide the direction/stop column. 
                     filterAttr: "track",           //Optional. Default is null, if set 'filterKey' also needs to be set. Allowed value: "track", "direction", "line" or "type"
                     filterKey: "A"             //Optional. Default is null, if set 'filterAttr' also needs to be set. Filter key is any value of the filtered attribute, see filtered board. 
+                    enableDepartureTimeColors: true, //Optional. Default is false, if set 'departureTimeColors' also needs to be set. See section "Departue time colors".
+                    departureTimeColors: [
+                    {
+                        max: 1,
+                        min: 0,
+                        color: "#660202"
+                    },
+                    {
+                      max: 4,
+                      min: 2,
+                      color: "#FF0000"
+                    },
+                    {
+                      max: 6,
+                      min: 4,
+                      color: "#FFF200"
+                    },
+                    {
+                      max: 15,
+                      min: 7,
+                      color: "#52FF33"
+                    }
+                  ]
             }
         },
     ...
@@ -112,6 +135,47 @@ config: {
 ```
 
 ![Example of filter on track](https://github.com/bureus/MMM-Vasttrafik-PublicTransport/blob/master/docs/filterOnLine.PNG)
+
+### Departure time colors
+Based on a feature request from @fillilutten there is now support to give you colorful warnings based on time (minutes) until departure. The functionality will give you the possibility to configure as many colors/warnings as you like. Only limitation is that two colors cant be active for the same departure time span. 
+ 
+To set color warnings you need to set two optional configurations "enableDepartureTimeColors" to "true" and add an array of departureTimeColor objects to "departureTimeColors" collection. the "departureTimeColor" object consists of three attributes. "max", which is maximum min until departure, "min" which is minimal time to departure and "color" which is the hex code representing the color which the warning should be rendered with, see example.
+ 
+#### Example - Departure warning by colors:
+Below configurations will give your board four different color warnings depending on time until departure. If departure time is within 1 min to departure the time remaining will be dark red (#660202), if departure time is within or equal two 2 - 4 mins it will be light red (#FF0000), if departure time is within 4 - 6 mins it will be yellow (#FFF200) and within 7 - 15 mins it will be light green (#52FF33)
+
+
+```
+config: {
+                    .....
+                    enableDepartureTimeColors: true,
+                    departureTimeColors: [
+                    {
+                        max: 1,
+                        min: 0,
+                        color: "#660202"
+                    },
+                    {
+                      max: 4,
+                      min: 2,
+                      color: "#FF0000"
+                    },
+                    {
+                      max: 6,
+                      min: 4,
+                      color: "#FFF200"
+                    },
+                    {
+                      max: 15,
+                      min: 7,
+                      color: "#52FF33"
+                    }
+                  ]
+                    ....
+        }
+```
+
+![Example departure warning by colors](https://github.com/bureus/MMM-Vasttrafik-PublicTransport/blob/master/docs/departureTimeColors.PNG)
 
 ### Minimal layout
 If you are after minimal width or design, you should set showTrackNumbers, showDestinationName and showStopHeader to false. This will render the board like this:

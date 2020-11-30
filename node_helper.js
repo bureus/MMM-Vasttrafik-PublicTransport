@@ -395,6 +395,9 @@ function sortByKey(array, key) {
 }
 
 function diffInMin(date1, date2) {
+  if(date1 > date2 && date2.getHours() > 22){
+    date2.setDate(date2.getDate() + 1);
+  }
   let diff = Math.abs(date2 - date1);
   return Math.floor(diff / 1000 / 60);
 }

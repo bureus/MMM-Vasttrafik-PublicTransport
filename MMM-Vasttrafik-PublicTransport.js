@@ -33,6 +33,7 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
     showDestinationName: true,
     filterAttr: null,
     filterKey: null,
+    enableDepartureTimeColors: false
   },
 
   getScripts: function () {
@@ -180,11 +181,11 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
       }
       td = document.createElement("td");
       td.innerHTML = this.getDisplayTime(line.departureIn);
-      td.style = "text-align: center;";
+      td.style = this.getDepartureTimeStyle(line.departureIn);
       row.appendChild(td);
       td = document.createElement("td");
       td.innerHTML = this.getDisplayTime(line.nextDeparture);
-      td.style = "text-align: center;";
+      td.style =  this.getDepartureTimeStyle(line.nextDeparture);
       row.appendChild(td);
       if (this.config.showTrackNumbers) {
         td = document.createElement("td");
@@ -197,7 +198,14 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
 
     return table.outerHTML;
   },
-
+  getDepartureTimeStyle: function(time){
+    if(this.config.enableDepartureTimeColors && this.config.departureTimeColors){
+      let departureTimeColor = this.config.departureTimeColors.find((x) => x.max >= time && x.min <= time);
+      if(departureTimeColor)
+        return "text-align: center; color: "+departureTimeColor.color;
+    }
+    return "text-align: center;";
+  },
   renderBoard: function () {
     if (
       this.domObjectCreated &&
