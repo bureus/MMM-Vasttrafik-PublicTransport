@@ -74,9 +74,9 @@ modules: [
                     },
                     showTrackNumbers: false,     //Optional. Default is true, if set to false will hide the track column.
                     showStopHeader: false,       //Optional. Default is true, if set to false will hide the stop name header.
-                    showDestinationName: false   //Optional. Default is true, if set to false will hide the direction/stop column. 
+                    showDestinationName: false,   //Optional. Default is true, if set to false will hide the direction/stop column. 
                     filterAttr: "track",           //Optional. Default is null, if set 'filterKey' also needs to be set. Allowed value: "track", "direction", "line" or "type"
-                    filterKey: "A"             //Optional. Default is null, if set 'filterAttr' also needs to be set. Filter key is any value of the filtered attribute, see filtered board. 
+                    filterKey: "A",             //Optional. Default is null, if set 'filterAttr' also needs to be set. Filter key is any value of the filtered attribute, see filtered board. 
                     enableDepartureTimeColors: true, //Optional. Default is false, if set 'departureTimeColors' also needs to be set. See section "Departue time colors".
                     departureTimeColors: [
                     {
