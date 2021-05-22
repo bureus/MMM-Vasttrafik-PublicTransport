@@ -181,8 +181,8 @@ module.exports = NodeHelper.create({
             dateObj(dep.rtTime ? dep.rtTime : dep.time),
             stop.now
           ),
-          color: dep.bgColor,
-          bgColor: dep.fgColor,
+          color: dep.fgColor,
+          bgColor: dep.bgColor,
           track: dep.track,
           depatuers: [dep],
           type: dep.type,
@@ -222,8 +222,8 @@ module.exports = NodeHelper.create({
               dateObj(dep.rtTime ? dep.rtTime : dep.time),
               stop.now
             ),
-            color: dep.bgColor,
-            bgColor: dep.fgColor,
+            color: dep.fgColor,
+            bgColor: dep.bgColor,
             track: dep.track,
             depatuers: [dep],
             type: dep.type,
