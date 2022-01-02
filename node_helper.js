@@ -17,7 +17,7 @@ const request = require("request-promise");
 const encode = require("nodejs-base64-encode");
 var parser = require("xml2js");
 var Url = require("url");
-var debugMe = false;
+var debugMe = true; //false;
 
 module.exports = NodeHelper.create({
   // --------------------------------------- Start the helper
@@ -88,14 +88,14 @@ module.exports = NodeHelper.create({
 
     clearInterval(this.updatetimer); // Clear the timer so that we can set it again
 
-    debug("stationid is array=" + Array.isArray(this.config.stopIds));
+    debug("stationid is array=" + Array.isArray(this.config.myStops));
     let Proms = [];
     // Loop over all stations
-    this.config.stopIds.forEach((stopId) => {
+    this.config.myStops.forEach((myStop) => {
       let P = new Promise((resolve, reject) => {
-        self.getDeparture(stopId, resolve, reject);
+        self.getDeparture(myStop, resolve, reject);
       });
-      debug("Pushing promise for stop " + stopId);
+      debug("Pushing promise for stop " + myStop.id);
       Proms.push(P);
     });
 
@@ -118,10 +118,10 @@ module.exports = NodeHelper.create({
     self.stops.push(stop);
   },
 
-  getDeparture: function (stopId, resolve, reject) {
+  getDeparture: function (myStop, resolve, reject) {
     let self = this;
     let currentStop = {};
-    debug("Getting departures for stop id: " + stopId);
+    debug("Getting departures for stop id: " + myStop.id);
     let now = new Date(Date.now());
     if (self.accessToken) {
       debug("Access token retrived: Calling depatureBoard");
@@ -132,7 +132,7 @@ module.exports = NodeHelper.create({
           Authorization: "Bearer " + self.accessToken.token,
         },
         qs: {
-          id: stopId,
+          id: myStop.id,
           date: now.toISOString().substring(0, 10),
           time: now.getHours() + ":" + now.getMinutes(),
         },
@@ -141,13 +141,13 @@ module.exports = NodeHelper.create({
 
       request(options)
         .then(function (response) {
-          debug("Depatuers for stop id: " + stopId + " retrived");
+          debug("Departures for stop id: " + myStop.id + " retrived");
           let responseJson;
           let parseString = parser.parseString;
           parseString(response, function (err, result) {
             responseJson = result;
           });
-          currentStop = self.getStop(stopId, responseJson.DepartureBoard);
+          currentStop = self.getStop(myStop, responseJson.DepartureBoard);
           debug("current stop: " + currentStop.name);
           resolve(currentStop);
         })
@@ -161,10 +161,10 @@ module.exports = NodeHelper.create({
     }
   },
 
-  getStop: function (stopId, depatureBoard) {
+  getStop: function (myStop, depatureBoard) {
     let self = this;
     let stop = {
-      stopId: stopId,
+      stopId: myStop.id,
       name: depatureBoard.Departure[0].$.stop,
       time: depatureBoard.$.servertime,
       lines: [],
@@ -232,17 +232,17 @@ module.exports = NodeHelper.create({
         }
       }
     }
-    if (this.config.filterAttr && this.config.filterKey) {
+    if (myStop.filterAttr && myStop.filterKey) {
       debug(
         "Filter board on: " +
-          this.config.filterAttr +
+          myStop.filterAttr +
           "=" +
-          this.config.filterKey
+          myStop.filterKey
       );
       var filteredArray = filterBoard(
         stop.lines,
-        this.config.filterAttr,
-        this.config.filterKey
+        myStop.filterAttr,
+        myStop.filterKey
       );
       stop.lines = sortByKey(filteredArray, self.config.sortBy);
     } else {
@@ -327,14 +327,14 @@ module.exports = NodeHelper.create({
 
     clearInterval(this.updateTimerTrafficSituations); // Clear the timer so that we can set it again
 
-    debug("stationid is array=" + Array.isArray(this.config.stopIds));
+    debug("stationid is array=" + Array.isArray(this.config.myStops));
     let Proms = [];
     // Loop over all stations
-    this.config.stopIds.forEach((stopId) => {
+    this.config.myStops.forEach((myStop) => {
       let P = new Promise((resolve, reject) => {
-        self.getTrafficSituation(stopId, resolve, reject);
+        self.getTrafficSituation(myStop.id, resolve, reject);
       });
-      debug("Pushing promise for traffic situations for " + stopId);
+      debug("Pushing promise for traffic situations for " + myStop.id);
       Proms.push(P);
     });
 
