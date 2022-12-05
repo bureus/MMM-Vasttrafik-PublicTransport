@@ -111,16 +111,16 @@ modules: [
 ]
 ```
 ### Filtered board
-If you want to filter the departure board you could do that by setting configs for "filterAttr" and "filterKey". Both settings needs to be set if used. Default is null. You cant filter on multiple keys, so for example you cannot filter on track "A,B" but only on "B" or "A".  
+If you want to filter the departure board you could do that by setting configs for "filterAttr" and "filterKey". Both settings needs to be set if used. Default is null. You _can_ filter on multiple keys, so for example you can filter on multiple tracks by setting the filterKeys to ["A", "B"].  
 
 #### Example A - filter on Track:
-So in order to filter the board on Track A. You could do that by simply setting "filterAttr" to "track" and "filterKey" to "A". This will remove all other tracks from the board. The same goes for "direction", "line" or "type".
+So in order to filter the board on Track A. You could do that by simply setting "filterAttr" to "track" and "filterKeys" to ["A"]. This will remove all other tracks from the board. The same goes for "direction", "line" or "type".
 
 ```js
 config: {
                     .....
                     filterAttr: "track",
-                    filterKey: "A"
+                    filterKeys: ["A"]
                     ....
         }
 ```
@@ -128,13 +128,13 @@ config: {
 ![Example of filter on track](https://github.com/bureus/MMM-Vasttrafik-PublicTransport/blob/master/docs/filterOnTrack.PNG)
 
 #### Example B - filter on Line:
-So in order to filter the board on Line 4. Change config settings "filterAttr" to "line" and "filterKey" to "4". This will remove all other lines from the board.
+So in order to filter the board on Line 4. Change config settings "filterAttr" to "line" and "filterKeys" to ["4"]. This will remove all other lines from the board.
 
 ```js
 config: {
                     .....
                     filterAttr: "line",
-                    filterKey: "4"
+                    filterKeys: "4"
                     ....
         }
 ```

@@ -232,17 +232,17 @@ module.exports = NodeHelper.create({
         }
       }
     }
-    if (myStop.filterAttr && myStop.filterKey) {
+    if (myStop.filterAttr && myStop.filterKeys) {
       debug(
         "Filter board on: " +
           myStop.filterAttr +
           "=" +
-          myStop.filterKey
+          myStop.filterKeys
       );
       var filteredArray = filterBoard(
         stop.lines,
         myStop.filterAttr,
-        myStop.filterKey
+        myStop.filterKeys
       );
       stop.lines = sortByKey(filteredArray, self.config.sortBy);
     } else {
@@ -382,8 +382,8 @@ module.exports = NodeHelper.create({
 //
 // Utilities
 //
-function filterBoard(array, attr, key) {
-  return array.filter(item => item[attr] == key);
+function filterBoard(array, attr, keys) {
+  return array.filter(item => keys.includes(item[attr]));
 }
 
 function sortByKey(array, key) {
