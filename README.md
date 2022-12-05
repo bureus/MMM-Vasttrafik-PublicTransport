@@ -62,7 +62,7 @@ modules: [
               {id: "your_stop_id1"},      // REQUIRED. An array of stop is's. Your are required to have at least one stop.
               {
                   id: "your_stop_id2",    // see 3. Get stops that you want to track.
-                  filterAttr: "track"     // Optional. Default is null, if set 'filterKey' also needs to be set. Allowed value: "track", "direction", "line" or "type"
+                  filterAttr: "track",     // Optional. Default is null, if set 'filterKey' also needs to be set. Allowed value: "track", "direction", "line" or "type"
                   filterKey: "A",         //Optional. Default is null, if set 'filterAttr' also needs to be set. Filter key is any value of the filtered attribute, see filtered board.
               }
             ],      
