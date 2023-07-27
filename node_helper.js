@@ -54,7 +54,7 @@ module.exports = NodeHelper.create({
       );
       let options = {
         method: "POST",
-        uri: "https://api.vasttrafik.se/token",
+        uri: "https://ext-api.vasttrafik.se/token",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
           Authorization: "Basic " + basicAuth,
@@ -127,14 +127,9 @@ module.exports = NodeHelper.create({
       debug("Access token retrived: Calling depatureBoard");
       let options = {
         method: "GET",
-        uri: "https://api.vasttrafik.se/bin/rest.exe/v2/departureBoard",
+        uri: `https://ext-api.vasttrafik.se/pr/v4/stop-areas/${stopId}/departures`,
         headers: {
           Authorization: "Bearer " + self.accessToken.token,
-        },
-        qs: {
-          id: stopId,
-          date: now.toISOString().substring(0, 10),
-          time: now.getHours() + ":" + now.getMinutes(),
         },
         json: true,
       };
@@ -142,12 +137,7 @@ module.exports = NodeHelper.create({
       request(options)
         .then(function (response) {
           debug("Depatuers for stop id: " + stopId + " retrived");
-          let responseJson;
-          let parseString = parser.parseString;
-          parseString(response, function (err, result) {
-            responseJson = result;
-          });
-          currentStop = self.getStop(stopId, responseJson.DepartureBoard);
+          currentStop = self.getStop(stopId, response);
           debug("current stop: " + currentStop.name);
           resolve(currentStop);
         })
@@ -165,41 +155,34 @@ module.exports = NodeHelper.create({
     let self = this;
     let stop = {
       stopId: stopId,
-      name: depatureBoard.Departure[0].$.stop,
-      time: depatureBoard.$.servertime,
+      name: depatureBoard.results[0].stopPoint.name,
       lines: [],
       now: new Date(Date.now()),
     };
 
-    for (let i = 0; i < depatureBoard.Departure.length; i++) {
-      let dep = depatureBoard.Departure[i].$;
+    for (let i = 0; i < depatureBoard.results.length; i++) {
+      let dep = depatureBoard.results[i];
       if (stop.lines.length === 0) {
         let line = {
-          direction: dep.direction,
-          line: dep.sname,
-          departureIn: diffInMin(
-            dateObj(dep.rtTime ? dep.rtTime : dep.time),
-            stop.now
-          ),
-          color: dep.fgColor,
-          bgColor: dep.bgColor,
-          track: dep.track,
-          depatuers: [dep],
-          type: dep.type,
+          direction: dep.serviceJourney.direction,
+          line: dep.serviceJourney.line.shortName,
+          departureIn: diffInMin(dep.estimatedTime, stop.now),
+          color: dep.serviceJourney.line.foregroundColor,
+          bgColor: dep.serviceJourney.line.backgroundColor,
+          track: dep.stopPoint.platform,
         };
+        debug("Pushing new element into departures line list: " + JSON.stringify(line, null, 2));
         stop.lines.push(line);
       } else {
         function findIndex(element) {
-          return element.track == dep.track && element.line == dep.sname;
+          return element.track == dep.stopPoint.platform && element.line == dep.serviceJourney.line.shortName;
         }
         let index = stop.lines.findIndex(findIndex);
         if (index > -1) {
+          debug("entered the twilight zone");
           let line = stop.lines[index];
-          line.depatuers.push(dep);
-          let depIn = diffInMin(
-            dateObj(dep.rtTime ? dep.rtTime : dep.time),
-            stop.now
-          );
+          debug("Line: " + JSON.stringify(line, null, 2));
+          let depIn = diffInMin(dep.estimatedTime, stop.now);
           if (line.departureIn > depIn) {
             let depInOld = line.departureIn;
             line.departureIn = depIn;
@@ -216,18 +199,13 @@ module.exports = NodeHelper.create({
           stop.lines[index] = line;
         } else {
           let line = {
-            direction: dep.direction,
-            line: dep.sname,
-            departureIn: diffInMin(
-              dateObj(dep.rtTime ? dep.rtTime : dep.time),
-              stop.now
-            ),
-            color: dep.fgColor,
-            bgColor: dep.bgColor,
-            track: dep.track,
-            depatuers: [dep],
-            type: dep.type,
-          };
+            direction: dep.serviceJourney.direction,
+            line: dep.serviceJourney.line.shortName,
+            departureIn: diffInMin(dep.estimatedTime, stop.now),
+            color: dep.serviceJourney.line.foregroundColor,
+            bgColor: dep.serviceJourney.line.backgroundColor,
+            track: dep.stopPoint.platform,
+            };
           stop.lines.push(line);
         }
       }
@@ -394,25 +372,14 @@ function sortByKey(array, key) {
   });
 }
 
-function diffInMin(date1, date2) {
-  if(date1 > date2 && date2.getHours() > 22){
-    date2.setDate(date2.getDate() + 1);
-  }
-  let diff = Math.abs(date2 - date1);
-  return Math.floor(diff / 1000 / 60);
+function diffInMin(estimatedTimeStr, now) {
+  let estTime = new Date(estimatedTimeStr);
+  let diff = Math.abs(estTime - now);
+  return Math.ceil(diff/1000/60);
 }
 
 function isDateBetween(fromDate, toDate, dateToCheck) {
   return dateToCheck > fromDate && dateToCheck < toDate;
-}
-
-// --------------------------------------- Create a date object with the time in timeStr (hh:mm)
-function dateObj(timeStr) {
-  let parts = timeStr.split(":");
-  let date = new Date();
-  date.setHours(+parts.shift());
-  date.setMinutes(+parts.shift());
-  return date;
 }
 
 // --------------------------------------- At beginning of log entries
@@ -429,5 +396,5 @@ function log(msg) {
 }
 // --------------------------------------- Debugging
 function debug(msg) {
-  if (debugMe) log(msg);
+  if (debugMe) console.debug(msg);
 }
