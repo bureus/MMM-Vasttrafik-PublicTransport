@@ -17,7 +17,7 @@ const request = require("request-promise");
 const encode = require("nodejs-base64-encode");
 var parser = require("xml2js");
 var Url = require("url");
-var debugMe = true; //false;
+var debugMe = false;
 
 module.exports = NodeHelper.create({
   // --------------------------------------- Start the helper
