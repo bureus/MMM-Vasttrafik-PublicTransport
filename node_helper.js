@@ -127,7 +127,7 @@ module.exports = NodeHelper.create({
       debug("Access token retrived: Calling depatureBoard");
       let options = {
         method: "GET",
-        uri: `https://ext-api.vasttrafik.se/pr/v4/stop-areas/${stopId}/departures`,
+        uri: `https://ext-api.vasttrafik.se/pr/v4/stop-areas/${myStop.id}/departures`,
         headers: {
           Authorization: "Bearer " + self.accessToken.token,
         },
@@ -136,8 +136,8 @@ module.exports = NodeHelper.create({
 
       request(options)
         .then(function (response) {
-          debug("Depatuers for stop id: " + stopId + " retrived");
-          currentStop = self.getStop(stopId, response);
+          debug("Depatuers for stop id: " + myStop.id + " retrived");
+          currentStop = self.getStop(myStop, response);
           debug("current stop: " + currentStop.name);
           resolve(currentStop);
         })
@@ -152,9 +152,10 @@ module.exports = NodeHelper.create({
   },
 
   getStop: function (myStop, depatureBoard) {
+    debug("MyStop: ", JSON.stringify(myStop));
     let self = this;
     let stop = {
-      stopId: stopId,
+      stopId: myStop.id,
       name: depatureBoard.results[0].stopPoint.name,
       lines: [],
       now: new Date(Date.now()),
@@ -171,7 +172,6 @@ module.exports = NodeHelper.create({
           bgColor: dep.serviceJourney.line.backgroundColor,
           track: dep.stopPoint.platform,
         };
-        debug("Pushing new element into departures line list: " + JSON.stringify(line, null, 2));
         stop.lines.push(line);
       } else {
         function findIndex(element) {
@@ -179,9 +179,7 @@ module.exports = NodeHelper.create({
         }
         let index = stop.lines.findIndex(findIndex);
         if (index > -1) {
-          debug("entered the twilight zone");
           let line = stop.lines[index];
-          debug("Line: " + JSON.stringify(line, null, 2));
           let depIn = diffInMin(dep.estimatedTime, stop.now);
           if (line.departureIn > depIn) {
             let depInOld = line.departureIn;
@@ -210,7 +208,7 @@ module.exports = NodeHelper.create({
         }
       }
     }
-    if (myStop.filterAttr && myStop.filterKeys) {
+    if (myStop.filterAttr != null && myStop.filterKeys != null) {
       debug(
         "Filter board on: " +
           myStop.filterAttr +
