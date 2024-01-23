@@ -67,8 +67,8 @@ modules: [
               }
             ],      
                                          
-            appKey: "your_app_key",       // REQUIRED. see 1. Create application and obtain required client id and secret.
-            appSecret: "your_app_secret", // REQUIRED. see 1. Create application and obtain required client id and secret.
+            appKey: "your_app_key",       // REQUIRED. see 1. Create application and obtain required client id and secret. Called "Klientidentifierare" on the website.
+            appSecret: "your_app_secret", // REQUIRED. see 1. Create application and obtain required client id and secret. Called "Hemlighet" on the website.
             debug: false,                 // Optional. Enable some extra output when debugging.
             sortBy: "track",              // Optional. Sort your departure board by either "track", "direction", "line" or "type"
                                           // default is "track".
