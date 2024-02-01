@@ -16,7 +16,7 @@
 Module.register("MMM-Vasttrafik-PublicTransport", {
   // Default module config.
   defaults: {
-    stopIds: ["9021014001950000"], //Centralstationen, Göteborg
+    myStops: [{id: "9021014001950000", filterAttr: null, filterKeys: [null]}], //Centralstationen, Göteborg
     appKey: "",
     appSecret: "",
     debug: false,
@@ -31,8 +31,6 @@ Module.register("MMM-Vasttrafik-PublicTransport", {
     showTrackNumbers: true,
     showStopHeader: true,
     showDestinationName: true,
-    filterAttr: null,
-    filterKey: null,
     enableDepartureTimeColors: false
   },
 
